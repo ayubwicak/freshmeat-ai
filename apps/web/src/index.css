@@ -13,27 +13,21 @@ body {
   min-width: 320px;
   min-height: 100vh;
   overflow-x: hidden;
-  font-family: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   background-color: #f8fafc;
-  background-image:
-    radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.06), transparent 50%),
-    radial-gradient(circle at 90% 20%, rgba(6, 182, 212, 0.05), transparent 45%),
-    linear-gradient(rgba(148, 163, 184, 0.07) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148, 163, 184, 0.07) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
   color: #0f172a;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
 ::selection {
-  background: rgba(16, 185, 129, 0.2);
-  color: #065f46;
+  background: #e2e8f0;
+  color: #0f172a;
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
+  scrollbar-color: #cbd5e1 transparent;
 }
 
 ::-webkit-scrollbar {
@@ -47,11 +41,11 @@ body {
 
 ::-webkit-scrollbar-thumb {
   border-radius: 9999px;
-  background: rgba(148, 163, 184, 0.35);
+  background: #cbd5e1;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(100, 116, 139, 0.5);
+  background: #94a3b8;
 }
 
 button,
@@ -62,36 +56,27 @@ select {
 }
 
 :focus-visible {
-  outline: 2px solid rgba(16, 185, 129, 0.7);
+  outline: 2px solid #0f172a;
   outline-offset: 2px;
 }
 
-/* Clean Biotech Card Style */
+/* Simple, functional card style */
 .glass-card {
   background: #ffffff;
-  border: 1px solid rgba(226, 232, 240, 0.95);
-  box-shadow:
-    0 1px 3px 0 rgba(15, 23, 42, 0.03),
-    0 10px 25px -5px rgba(15, 23, 42, 0.05);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
 }
 
-.glass-card:hover {
-  border-color: rgba(203, 213, 225, 1);
-  box-shadow:
-    0 2px 5px 0 rgba(15, 23, 42, 0.04),
-    0 14px 28px -6px rgba(15, 23, 42, 0.07);
-}
-
-/* Scanner HUD & Laser Line */
+/* Scanner Laser Line */
 .scanner-line {
   position: absolute;
   left: 0;
   top: 4%;
   width: 100%;
   height: 2px;
-  background: linear-gradient(90deg, transparent, #10b981, #38bdf8, #10b981, transparent);
-  box-shadow: 0 0 16px 3px rgba(16, 185, 129, 0.7);
+  background: #059669;
+  box-shadow: 0 0 8px rgba(5, 150, 105, 0.6);
   display: none;
   z-index: 25;
 }
@@ -116,51 +101,39 @@ select {
   }
 }
 
+/* Functional ROI Box */
 .roi-box {
   position: absolute;
-  border: 2px dashed rgba(16, 185, 129, 0.9);
-  background: rgba(16, 185, 129, 0.08);
-  box-shadow:
-    inset 0 0 28px rgba(16, 185, 129, 0.1),
-    0 0 12px rgba(16, 185, 129, 0.15);
+  border: 2px dashed #059669;
+  background: rgba(5, 150, 105, 0.06);
   pointer-events: none;
-  transition: all 0.35s ease;
+  transition: all 0.25s ease;
 }
 
-/* Custom Sliders */
+/* Sliders */
 input[type="range"] {
-  accent-color: #059669;
+  accent-color: #0f172a;
 }
 
 .range-input::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border-radius: 9999px;
-  border: 3px solid #059669;
+  border: 2px solid #0f172a;
   background: #ffffff;
-  box-shadow:
-    0 1px 3px rgba(0, 0, 0, 0.15),
-    0 0 0 4px rgba(16, 185, 129, 0.15);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   cursor: pointer;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-}
-
-.range-input::-webkit-slider-thumb:hover {
-  transform: scale(1.12);
-  box-shadow:
-    0 2px 5px rgba(0, 0, 0, 0.2),
-    0 0 0 6px rgba(16, 185, 129, 0.25);
 }
 
 .range-input::-moz-range-thumb {
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   border-radius: 9999px;
-  border: 3px solid #059669;
+  border: 2px solid #0f172a;
   background: #ffffff;
-  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
   cursor: pointer;
 }
 

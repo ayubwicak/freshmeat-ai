@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { ChevronDown, FolderPlus, Layers3, Loader2, Plus, X } from 'lucide-react'
+import { ChevronDown, FolderPlus, Loader2, Plus, X } from 'lucide-react'
 import { COMMODITIES, commodityShortName } from '@freshmeat/analysis'
 
 const selectClass =
-  'w-full appearance-none rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 shadow-xs outline-none transition focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20'
+  'w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 outline-none focus:border-slate-400'
 
 export default function BatchPanel({
   batches,
@@ -43,9 +43,7 @@ export default function BatchPanel({
       setOpen(false)
     } catch (createError) {
       console.warn('Gagal membuat batch:', createError)
-      setError(
-        'Batch belum bisa dibuat. Pastikan backend FastAPI aktif, lalu coba lagi.',
-      )
+      setError('Batch belum bisa dibuat. Pastikan backend FastAPI aktif, lalu coba lagi.')
     } finally {
       setSubmitting(false)
     }
@@ -55,45 +53,37 @@ export default function BatchPanel({
     <>
       <section
         id="batch"
-        className="glass-card mb-6 mt-6 scroll-mt-24 rounded-3xl p-6"
+        className="glass-card mb-6 scroll-mt-20 p-4"
       >
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="flex min-w-0 items-start gap-3.5">
-            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-teal-100 text-teal-700">
-              <Layers3 className="h-5 w-5" aria-hidden="true" />
-            </div>
-            <div className="min-w-0">
-              <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-teal-700">
-                  Batch Kedatangan Daging
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-semibold text-slate-700">Batch Kedatangan Daging</span>
+              {activeBatch && (
+                <span className="rounded bg-emerald-100 px-2 py-0.5 text-[10px] font-semibold text-emerald-800">
+                  Aktif
                 </span>
-                {activeBatch && (
-                  <span className="rounded-full border border-teal-200 bg-teal-50 px-2.5 py-0.5 font-mono text-[9px] font-bold text-teal-700">
-                    AKTIF
-                  </span>
-                )}
-              </div>
-              <h2 className="mt-1 truncate text-base font-black text-slate-900 sm:text-lg">
-                {activeBatch ? activeBatch.name : 'Belum Ada Batch Aktif'}
-              </h2>
-              <p className="mt-0.5 text-xs text-slate-500">
-                {activeBatch
-                  ? `${activeBatch.batch_id} · ${commodityShortName(
-                      activeBatch.commodity,
-                    )} · ${activeBatch.sample_count} sampel diuji`
-                  : 'Kelompokkan beberapa foto dari kedatangan daging yang sama dalam satu batch.'}
-              </p>
+              )}
             </div>
+            <div className="mt-0.5 text-sm font-bold text-slate-900">
+              {activeBatch ? activeBatch.name : 'Tidak ada batch aktif (Mode Mandiri)'}
+            </div>
+            {activeBatch && (
+              <div className="mt-0.5 text-xs text-slate-500">
+                {activeBatch.batch_id} · {commodityShortName(activeBatch.commodity)} · {activeBatch.sample_count} sampel diuji
+                {activeBatch.average_score != null && ` · Rata-rata skor: ${activeBatch.average_score}/100`}
+              </div>
+            )}
           </div>
 
-          <div className="flex flex-col gap-2.5 sm:flex-row sm:items-center lg:shrink-0">
+          <div className="flex items-center gap-2">
             {batches.length > 0 && (
               <div className="relative">
                 <select
                   value={activeBatch?.batch_id ?? ''}
                   onChange={(event) => onSelect(event.target.value || null)}
                   aria-label="Pilih batch aktif"
-                  className="w-full appearance-none rounded-xl border border-slate-200 bg-white py-2.5 pl-3.5 pr-9 text-xs font-semibold text-slate-800 shadow-xs outline-none transition hover:border-slate-300 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20 sm:w-60"
+                  className="appearance-none rounded-lg border border-slate-200 bg-white py-1.5 pl-3 pr-8 text-xs font-medium text-slate-700 hover:border-slate-300"
                 >
                   <option value="">Tanpa batch (Mandiri)</option>
                   {batches.map((batch) => (
@@ -102,38 +92,20 @@ export default function BatchPanel({
                     </option>
                   ))}
                 </select>
-                <ChevronDown
-                  className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
-                  aria-hidden="true"
-                />
+                <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
               </div>
             )}
 
             <button
               type="button"
               onClick={openModal}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-teal-600 px-4 py-2.5 text-xs font-bold text-white shadow-sm shadow-teal-600/25 transition hover:bg-teal-700 active:scale-[0.98]"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
             >
-              <Plus className="h-4 w-4" aria-hidden="true" />
-              <span>Buat Batch Baru</span>
+              <Plus className="h-3.5 w-3.5" />
+              <span>Batch Baru</span>
             </button>
           </div>
         </div>
-
-        {activeBatch && (
-          <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-slate-100 pt-3 font-mono text-[11px] text-slate-500">
-            <span className="flex items-center gap-1.5">
-              <span>Rata-rata Skor Batch:</span>
-              <strong className="text-slate-900 font-bold text-xs">
-                {activeBatch.average_score ?? '—'}/100
-              </strong>
-            </span>
-            <span className="text-slate-300">•</span>
-            <span className="text-teal-700 font-semibold">
-              Foto baru otomatis tercatat di batch ini
-            </span>
-          </div>
-        )}
       </section>
 
       {/* Modal Dialog */}
@@ -142,45 +114,31 @@ export default function BatchPanel({
           role="dialog"
           aria-modal="true"
           aria-labelledby="batchModalTitle"
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/50 p-4 backdrop-blur-sm"
+          className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/40 p-4"
           onClick={() => !submitting && setOpen(false)}
         >
           <div
-            className="w-full max-w-md rounded-3xl border border-slate-200 bg-white p-6 shadow-2xl"
+            className="w-full max-w-sm rounded-lg border border-slate-200 bg-white p-5 shadow-lg"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="flex items-start justify-between gap-3 border-b border-slate-100 pb-4">
-              <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-teal-100 text-teal-700">
-                  <FolderPlus className="h-5 w-5" />
-                </div>
-                <div>
-                  <h3 id="batchModalTitle" className="text-base font-bold text-slate-900">
-                    Tambah Batch Baru
-                  </h3>
-                  <p className="mt-0.5 text-xs text-slate-500">
-                    Registrasi kelompok inspeksi untuk kedatangan spesimen
-                  </p>
-                </div>
-              </div>
-
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <h3 id="batchModalTitle" className="text-sm font-bold text-slate-900">
+                Tambah Batch Baru
+              </h3>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
                 disabled={submitting}
-                className="rounded-xl p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700 disabled:opacity-50"
+                className="text-slate-400 hover:text-slate-700"
                 aria-label="Tutup formulir batch"
               >
                 <X className="h-4 w-4" />
               </button>
             </div>
 
-            <form onSubmit={submit} className="mt-5 space-y-4">
+            <form onSubmit={submit} className="mt-4 space-y-3">
               <div>
-                <label
-                  htmlFor="batchName"
-                  className="mb-1.5 block text-xs font-semibold text-slate-700"
-                >
+                <label htmlFor="batchName" className="mb-1 block text-xs font-medium text-slate-700">
                   Nama Batch <span className="text-slate-400 font-normal">(opsional)</span>
                 </label>
                 <input
@@ -188,19 +146,16 @@ export default function BatchPanel({
                   type="text"
                   value={name}
                   onChange={(event) => setName(event.target.value)}
-                  placeholder="Misal: Batch Kedatangan RPH #104"
+                  placeholder="Misal: Batch Kedatangan #104"
                   maxLength={80}
                   autoFocus
-                  className="w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 shadow-xs outline-none transition placeholder:text-slate-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-500/20"
+                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-800 outline-none focus:border-slate-400"
                 />
               </div>
 
               <div>
-                <label
-                  htmlFor="batchCommodity"
-                  className="mb-1.5 block text-xs font-semibold text-slate-700"
-                >
-                  Jenis Komoditas Daging
+                <label htmlFor="batchCommodity" className="mb-1 block text-xs font-medium text-slate-700">
+                  Komoditas Daging
                 </label>
                 <select
                   id="batchCommodity"
@@ -216,38 +171,28 @@ export default function BatchPanel({
                 </select>
               </div>
 
-              <div className="rounded-2xl border border-teal-200 bg-teal-50/70 p-3.5 text-xs text-teal-900">
-                Setelah batch dibuat, foto-foto yang diunggah akan secara otomatis tercatat dalam grup inspeksi ini.
-              </div>
-
               {error && (
-                <p className="rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs font-medium text-rose-700">
+                <p className="rounded border border-rose-200 bg-rose-50 p-2 text-xs text-rose-700">
                   {error}
                 </p>
               )}
 
-              <div className="flex justify-end gap-2.5 pt-2">
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
                   disabled={submitting}
-                  className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-xs font-semibold text-slate-700 shadow-xs transition hover:bg-slate-50 disabled:opacity-50"
+                  className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="inline-flex items-center gap-2 rounded-xl bg-teal-600 px-5 py-2.5 text-xs font-bold text-white shadow-sm shadow-teal-600/25 transition hover:bg-teal-700 active:scale-[0.98] disabled:opacity-60"
+                  className="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-4 py-1.5 text-xs font-medium text-white hover:bg-slate-800 disabled:opacity-50"
                 >
-                  {submitting ? (
-                    <>
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      <span>Menyimpan...</span>
-                    </>
-                  ) : (
-                    <span>Simpan Batch</span>
-                  )}
+                  {submitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
+                  <span>Simpan</span>
                 </button>
               </div>
             </form>

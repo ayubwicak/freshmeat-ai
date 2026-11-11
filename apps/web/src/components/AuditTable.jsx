@@ -1,35 +1,15 @@
 import { useState } from 'react'
-import {
-  ClipboardList,
-  Database,
-  Download,
-  Printer,
-  Search,
-  X,
-} from 'lucide-react'
+import { Download, Printer, Search, X } from 'lucide-react'
 import { commodityShortName } from '@freshmeat/analysis'
 
 function badgeClass(score) {
   if (score >= 80) {
-    return 'border-emerald-200 bg-emerald-50 text-emerald-800'
+    return 'bg-emerald-100 text-emerald-800'
   }
   if (score >= 55) {
-    return 'border-amber-200 bg-amber-50 text-amber-800'
+    return 'bg-amber-100 text-amber-800'
   }
-  return 'border-rose-200 bg-rose-50 text-rose-800'
-}
-
-function EmptyState({ hasLogs }) {
-  return (
-    <div className="flex flex-col items-center justify-center gap-2.5 px-4 py-12 text-center">
-      <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-100 text-slate-400">
-        <Database className="h-6 w-6" aria-hidden="true" />
-      </div>
-      <p className="text-xs text-slate-500">
-        {hasLogs ? 'Tidak ada rekaman yang cocok dengan pencarian.' : 'Belum ada rekaman inspeksi.'}
-      </p>
-    </div>
-  )
+  return 'bg-rose-100 text-rose-800'
 }
 
 export default function AuditTable({ logs, onExport, onPrint }) {
@@ -45,166 +25,95 @@ export default function AuditTable({ logs, onExport, onPrint }) {
     : logs
 
   return (
-    <div className="glass-card overflow-hidden rounded-3xl">
-      <div className="border-b border-slate-100 bg-slate-50/50 p-6">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex items-center gap-3.5">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-2xl bg-indigo-100 text-indigo-700">
-              <ClipboardList className="h-5 w-5" aria-hidden="true" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-sm font-bold text-slate-900 sm:text-base">
-                  Riwayat &amp; Log Inspeksi
-                </h3>
-                <span className="rounded-md border border-indigo-200 bg-indigo-50 px-2 py-0.5 font-mono text-[9px] font-bold text-indigo-700">
-                  SQLITE
-                </span>
-              </div>
-              <p className="mt-0.5 text-xs text-slate-500">
-                Log audit persisten dengan parameter CIELAB, biomarker, dan status mutu
-              </p>
-            </div>
+    <div className="glass-card overflow-hidden">
+      <div className="border-b border-slate-100 p-4">
+        <div className="flex items-center justify-between gap-2">
+          <div>
+            <h3 className="text-sm font-bold text-slate-900">Riwayat &amp; Log Inspeksi</h3>
+            <p className="text-xs text-slate-500">Daftar rekaman pengujian mutu sampel</p>
           </div>
-          <span
-            id="logCounter"
-            className="shrink-0 rounded-full border border-slate-200 bg-white px-3 py-1 font-mono text-[10px] font-bold text-slate-700 shadow-xs"
-          >
+          <span id="logCounter" className="rounded bg-slate-100 px-2 py-0.5 text-xs font-mono text-slate-600">
             {logs.length} Rekaman
           </span>
         </div>
 
-        <div className="mt-4 flex flex-col gap-2.5 sm:flex-row">
+        <div className="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <div className="relative flex-1">
-            <Search
-              className="pointer-events-none absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400"
-              aria-hidden="true"
-            />
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
             <input
               type="search"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              placeholder="Cari ID sampel, nama batch, komoditas, atau status..."
+              placeholder="Cari ID, batch, komoditas..."
               aria-label="Cari riwayat inspeksi"
-              className="w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-10 pr-9 text-xs text-slate-800 shadow-xs outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20"
+              className="w-full rounded-lg border border-slate-200 py-1.5 pl-8 pr-7 text-xs text-slate-800 outline-none focus:border-slate-400"
             />
             {query && (
               <button
                 type="button"
                 onClick={() => setQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-lg p-1 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
                 aria-label="Hapus pencarian"
               >
-                <X className="h-3.5 w-3.5" />
+                <X className="h-3 w-3" />
               </button>
             )}
           </div>
 
-          <div className="grid grid-cols-2 gap-2 sm:flex">
+          <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={onExport}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-semibold text-slate-700 shadow-xs transition hover:bg-slate-50 active:scale-[0.98]"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
             >
-              <Download className="h-3.5 w-3.5 text-cyan-600" aria-hidden="true" />
+              <Download className="h-3.5 w-3.5" />
               <span>Ekspor JSON</span>
             </button>
             <button
               type="button"
               onClick={onPrint}
-              className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs font-semibold text-slate-700 shadow-xs transition hover:bg-slate-50 active:scale-[0.98]"
+              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
             >
-              <Printer className="h-3.5 w-3.5 text-emerald-600" aria-hidden="true" />
-              <span>Cetak Sertifikat</span>
+              <Printer className="h-3.5 w-3.5" />
+              <span>Cetak Hasil</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* Mobile Feed */}
-      <div className="divide-y divide-slate-100 sm:hidden">
-        {filteredLogs.length === 0 ? (
-          <EmptyState hasLogs={logs.length > 0} />
-        ) : (
-          filteredLogs.map((log) => (
-            <div key={log.id} className="p-4 transition hover:bg-slate-50/60">
-              <div className="flex items-center justify-between gap-2">
-                <span className="font-mono text-[10px] text-slate-500">{log.id}</span>
-                <span
-                  className={`shrink-0 rounded-full border px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wide ${badgeClass(
-                    log.score,
-                  )}`}
-                >
-                  {log.status}
-                </span>
-              </div>
-              <div className="mt-2 flex items-center justify-between gap-2 text-xs">
-                <span className="truncate font-bold text-slate-900">
-                  {commodityShortName(log.commodity)}
-                </span>
-                <span className="shrink-0 font-mono text-slate-600">
-                  Skor: <strong className="text-slate-900">{log.score}</strong> · TVB-N: {log.tvbn}
-                </span>
-              </div>
-              <div className="mt-1 flex items-center gap-2 font-mono text-[10px] text-teal-700">
-                <span>Batch: {log.batchName ?? 'Mandiri'}</span>
-              </div>
-            </div>
-          ))
-        )}
-      </div>
-
       {/* Desktop Table */}
-      <div className="hidden overflow-x-auto sm:block">
-        <table className="w-full min-w-[500px] table-fixed border-collapse text-left text-xs">
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[500px] border-collapse text-left text-xs">
           <thead>
-            <tr className="border-b border-slate-100 bg-slate-50/70 font-mono text-[10px] uppercase tracking-wider text-slate-500">
-              <th className="w-[30%] px-6 py-3 font-semibold">ID Inspeksi &amp; Batch</th>
-              <th className="w-[20%] px-4 py-3 font-semibold">Komoditas</th>
-              <th className="w-[14%] px-3 py-3 font-semibold">Skor</th>
-              <th className="w-[18%] px-3 py-3 font-semibold">TVB-N</th>
-              <th className="w-[18%] px-4 py-3 font-semibold">Status</th>
+            <tr className="border-b border-slate-100 bg-slate-50/70 text-[11px] font-semibold text-slate-600">
+              <th className="px-4 py-2.5">ID Inspeksi &amp; Batch</th>
+              <th className="px-3 py-2.5">Komoditas</th>
+              <th className="px-3 py-2.5">Skor Mutu</th>
+              <th className="px-3 py-2.5">TVB-N</th>
+              <th className="px-4 py-2.5">Status</th>
             </tr>
           </thead>
-          <tbody
-            id="auditTableBody"
-            className="divide-y divide-slate-100 text-xs text-slate-800"
-          >
+          <tbody id="auditTableBody" className="divide-y divide-slate-100 text-slate-700">
             {filteredLogs.length === 0 ? (
               <tr>
-                <td colSpan={5}>
-                  <EmptyState hasLogs={logs.length > 0} />
+                <td colSpan={5} className="py-8 text-center text-xs text-slate-400">
+                  {logs.length > 0 ? 'Tidak ada rekaman yang cocok.' : 'Belum ada rekaman inspeksi.'}
                 </td>
               </tr>
             ) : (
               filteredLogs.map((log) => (
-                <tr
-                  key={log.id}
-                  className="transition-colors hover:bg-slate-50/60"
-                >
-                  <td className="px-6 py-3.5">
-                    <div className="truncate font-mono text-[11px] font-semibold text-slate-900">
-                      {log.id}
-                    </div>
-                    <div className="mt-0.5 truncate font-mono text-[10px] text-teal-700 font-medium">
-                      {log.batchName ? `Batch: ${log.batchName}` : 'Tanpa batch'}
+                <tr key={log.id} className="hover:bg-slate-50/50">
+                  <td className="px-4 py-2.5">
+                    <div className="font-mono font-medium text-slate-900">{log.id}</div>
+                    <div className="text-[11px] text-slate-400">
+                      {log.batchName ? `Batch: ${log.batchName}` : 'Mandiri'}
                     </div>
                   </td>
-                  <td className="truncate px-4 py-3.5 font-medium text-slate-700">
-                    {commodityShortName(log.commodity)}
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-3.5 font-mono font-black tabular-nums text-slate-900">
-                    {log.score}/100
-                  </td>
-                  <td className="whitespace-nowrap px-3 py-3.5 font-mono tabular-nums text-slate-600">
-                    {log.tvbn} mg/100g
-                  </td>
-                  <td className="px-4 py-3.5">
-                    <span
-                      className={`inline-flex max-w-full truncate rounded-full border px-2.5 py-0.5 font-mono text-[10px] font-black uppercase tracking-wide ${badgeClass(
-                        log.score,
-                      )}`}
-                    >
+                  <td className="px-3 py-2.5 font-medium">{commodityShortName(log.commodity)}</td>
+                  <td className="px-3 py-2.5 font-mono font-bold text-slate-900">{log.score}/100</td>
+                  <td className="px-3 py-2.5 font-mono text-slate-600">{log.tvbn} mg/100g</td>
+                  <td className="px-4 py-2.5">
+                    <span className={`inline-block rounded px-2 py-0.5 text-[10px] font-semibold ${badgeClass(log.score)}`}>
                       {log.status}
                     </span>
                   </td>
