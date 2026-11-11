@@ -1,0 +1,31 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+build/
+
+# Node
+node_modules/
+dist/
+
+# Environment & secrets
+.env
+.env.*
+
+# OS & editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Local artifacts
+*.log
+FreshMeat_AI_Audit_Report.json
+
+# Runtime database
+apps/api/data/

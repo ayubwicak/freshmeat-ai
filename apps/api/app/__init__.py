@@ -1,0 +1,1 @@
+"""FreshMeat AI FastAPI service."""

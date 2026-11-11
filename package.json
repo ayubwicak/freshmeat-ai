@@ -1,0 +1,15 @@
+{
+  "name": "freshmeat-ai",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "apps/web",
+    "packages/analysis",
+    "packages/api-client"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @freshmeat/web",
+    "build": "npm run build -w @freshmeat/web",
+    "preview": "npm run preview -w @freshmeat/web"
+  }
+}

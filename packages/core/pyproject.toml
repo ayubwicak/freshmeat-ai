@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "freshmeat-core"
+version = "1.0.0"
+description = "FreshMeat AI domain core: computer vision, scoring, and rules."
+requires-python = ">=3.11"
+dependencies = [
+    "numpy>=2.0",
+    "opencv-python-headless>=4.10",
+    "pydantic>=2.9",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
