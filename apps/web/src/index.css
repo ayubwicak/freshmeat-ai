@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  color-scheme: dark;
+  color-scheme: light;
 }
 
 html {
@@ -14,27 +14,26 @@ body {
   min-height: 100vh;
   overflow-x: hidden;
   font-family: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  background-color: #060b13;
+  background-color: #f8fafc;
   background-image:
-    radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.12), transparent 45%),
-    radial-gradient(circle at 85% 20%, rgba(6, 182, 212, 0.08), transparent 40%),
-    radial-gradient(circle at 15% 50%, rgba(99, 102, 241, 0.06), transparent 45%),
-    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
-  background-size: 100% 100%, 100% 100%, 100% 100%, 32px 32px, 32px 32px;
-  color: #f1f5f9;
+    radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.06), transparent 50%),
+    radial-gradient(circle at 90% 20%, rgba(6, 182, 212, 0.05), transparent 45%),
+    linear-gradient(rgba(148, 163, 184, 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(148, 163, 184, 0.07) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+  color: #0f172a;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
 ::selection {
-  background: rgba(16, 185, 129, 0.4);
-  color: #ffffff;
+  background: rgba(16, 185, 129, 0.2);
+  color: #065f46;
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(148, 163, 184, 0.25) transparent;
+  scrollbar-color: rgba(148, 163, 184, 0.35) transparent;
 }
 
 ::-webkit-scrollbar {
@@ -48,11 +47,11 @@ body {
 
 ::-webkit-scrollbar-thumb {
   border-radius: 9999px;
-  background: rgba(148, 163, 184, 0.25);
+  background: rgba(148, 163, 184, 0.35);
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(148, 163, 184, 0.45);
+  background: rgba(100, 116, 139, 0.5);
 }
 
 button,
@@ -63,30 +62,25 @@ select {
 }
 
 :focus-visible {
-  outline: 2px solid rgba(52, 211, 153, 0.65);
+  outline: 2px solid rgba(16, 185, 129, 0.7);
   outline-offset: 2px;
 }
 
-/* Glassmorphism Cards */
+/* Clean Biotech Card Style */
 .glass-card {
-  background: linear-gradient(135deg, rgba(15, 23, 42, 0.85) 0%, rgba(10, 16, 28, 0.82) 100%);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  background: #ffffff;
+  border: 1px solid rgba(226, 232, 240, 0.95);
   box-shadow:
-    0 20px 40px -15px rgba(0, 0, 0, 0.7),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    0 1px 3px 0 rgba(15, 23, 42, 0.03),
+    0 10px 25px -5px rgba(15, 23, 42, 0.05);
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .glass-card:hover {
-  border-color: rgba(255, 255, 255, 0.12);
-}
-
-.glass-card-subtle {
-  background: linear-gradient(135deg, rgba(17, 24, 39, 0.6) 0%, rgba(11, 18, 32, 0.5) 100%);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-color: rgba(203, 213, 225, 1);
+  box-shadow:
+    0 2px 5px 0 rgba(15, 23, 42, 0.04),
+    0 14px 28px -6px rgba(15, 23, 42, 0.07);
 }
 
 /* Scanner HUD & Laser Line */
@@ -96,8 +90,8 @@ select {
   top: 4%;
   width: 100%;
   height: 2px;
-  background: linear-gradient(90deg, transparent, #10b981, #67e8f9, #10b981, transparent);
-  box-shadow: 0 0 18px 4px rgba(16, 185, 129, 0.75);
+  background: linear-gradient(90deg, transparent, #10b981, #38bdf8, #10b981, transparent);
+  box-shadow: 0 0 16px 3px rgba(16, 185, 129, 0.7);
   display: none;
   z-index: 25;
 }
@@ -124,18 +118,18 @@ select {
 
 .roi-box {
   position: absolute;
-  border: 2px dashed rgba(52, 211, 153, 0.85);
-  background: rgba(16, 185, 129, 0.06);
+  border: 2px dashed rgba(16, 185, 129, 0.9);
+  background: rgba(16, 185, 129, 0.08);
   box-shadow:
-    inset 0 0 32px rgba(16, 185, 129, 0.08),
+    inset 0 0 28px rgba(16, 185, 129, 0.1),
     0 0 12px rgba(16, 185, 129, 0.15);
   pointer-events: none;
-  transition: all 0.4s ease;
+  transition: all 0.35s ease;
 }
 
 /* Custom Sliders */
 input[type="range"] {
-  accent-color: #10b981;
+  accent-color: #059669;
 }
 
 .range-input::-webkit-slider-thumb {
@@ -144,29 +138,29 @@ input[type="range"] {
   width: 18px;
   height: 18px;
   border-radius: 9999px;
-  border: 3px solid #10b981;
+  border: 3px solid #059669;
   background: #ffffff;
   box-shadow:
-    0 0 0 4px rgba(16, 185, 129, 0.2),
-    0 2px 6px rgba(0, 0, 0, 0.5);
+    0 1px 3px rgba(0, 0, 0, 0.15),
+    0 0 0 4px rgba(16, 185, 129, 0.15);
   cursor: pointer;
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
 .range-input::-webkit-slider-thumb:hover {
-  transform: scale(1.15);
+  transform: scale(1.12);
   box-shadow:
-    0 0 0 6px rgba(16, 185, 129, 0.3),
-    0 2px 8px rgba(0, 0, 0, 0.6);
+    0 2px 5px rgba(0, 0, 0, 0.2),
+    0 0 0 6px rgba(16, 185, 129, 0.25);
 }
 
 .range-input::-moz-range-thumb {
   width: 18px;
   height: 18px;
   border-radius: 9999px;
-  border: 3px solid #10b981;
+  border: 3px solid #059669;
   background: #ffffff;
-  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.2);
+  box-shadow: 0 0 0 4px rgba(16, 185, 129, 0.15);
   cursor: pointer;
 }
 
@@ -179,41 +173,8 @@ input[type="search"]::-webkit-search-cancel-button {
 }
 
 select option {
-  background-color: #0b1320;
-  color: #f1f5f9;
-  padding: 8px 12px;
-}
-
-/* Shimmer & Glow Effects */
-.glow-emerald {
-  box-shadow: 0 0 25px -4px rgba(16, 185, 129, 0.35);
-}
-
-.glow-cyan {
-  box-shadow: 0 0 25px -4px rgba(6, 182, 212, 0.35);
-}
-
-.glow-amber {
-  box-shadow: 0 0 25px -4px rgba(245, 158, 11, 0.35);
-}
-
-.glow-rose {
-  box-shadow: 0 0 25px -4px rgba(244, 63, 94, 0.35);
-}
-
-@keyframes pulseGlow {
-  0%, 100% {
-    opacity: 0.6;
-    transform: scale(1);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.04);
-  }
-}
-
-.animate-pulse-glow {
-  animation: pulseGlow 2.5s ease-in-out infinite;
+  background-color: #ffffff;
+  color: #0f172a;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -29,27 +29,27 @@ const STANDARDS = [
     range: 'Skor Mutu ≥ 80',
     description: 'Kondisi kesegaran optimal, jaringan otot kenyal, pigmen mioglobin stabil. Layak edar & konsumsi prima.',
     icon: CheckCircle2,
-    className: 'border-emerald-500/30 bg-emerald-500/[0.08] hover:border-emerald-500/50',
-    iconClass: 'bg-emerald-500/20 text-emerald-300',
-    titleClass: 'text-emerald-300',
+    className: 'border-emerald-200 bg-emerald-50/70 hover:border-emerald-300',
+    iconClass: 'bg-emerald-100 text-emerald-700',
+    titleClass: 'text-emerald-800',
   },
   {
     label: 'Grade B (Sub-Fresh)',
     range: 'Skor Mutu 55–79,9',
     description: 'Terjadi degradasi mutu awal atau mendekati batas masa simpan. Butuh penanganan cold-chain segera.',
     icon: AlertTriangle,
-    className: 'border-amber-500/30 bg-amber-500/[0.08] hover:border-amber-500/50',
-    iconClass: 'bg-amber-500/20 text-amber-300',
-    titleClass: 'text-amber-300',
+    className: 'border-amber-200 bg-amber-50/70 hover:border-amber-300',
+    iconClass: 'bg-amber-100 text-amber-700',
+    titleClass: 'text-amber-800',
   },
   {
     label: 'Reject (Afkir/Busuk)',
     range: 'Skor Mutu < 55',
     description: 'Tidak layak konsumsi. Terdeteksi TVB-N tinggi, lendir lengket, dekomposisi atau indikasi gelonggongan.',
     icon: XCircle,
-    className: 'border-rose-500/30 bg-rose-500/[0.08] hover:border-rose-500/50',
-    iconClass: 'bg-rose-500/20 text-rose-300',
-    titleClass: 'text-rose-300',
+    className: 'border-rose-200 bg-rose-50/70 hover:border-rose-300',
+    iconClass: 'bg-rose-100 text-rose-700',
+    titleClass: 'text-rose-800',
   },
 ]
 
@@ -346,7 +346,7 @@ export default function App() {
   const handleExport = () => exportAuditJson(auditLogs)
 
   return (
-    <div className="min-h-screen text-slate-100">
+    <div className="min-h-screen text-slate-800">
       <Sidebar
         open={navOpen}
         onClose={() => setNavOpen(false)}
@@ -364,30 +364,30 @@ export default function App() {
           <section id="pemeriksaan" className="scroll-mt-24">
             <div className="flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
               <div>
-                <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-3.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-300 shadow-[0_0_15px_-3px_rgba(16,185,129,0.3)]">
+                <div className="inline-flex items-center gap-2 rounded-full border border-emerald-200 bg-emerald-50 px-3.5 py-1 text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-700 shadow-xs">
                   <span className="relative flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-600" />
                   </span>
                   Sistem Inspeksi Mutu Aktif
                 </div>
-                <h1 className="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl lg:text-[40px] leading-[1.1]">
+                <h1 className="mt-3 text-3xl font-black tracking-tight text-slate-900 sm:text-4xl lg:text-[40px] leading-[1.1]">
                   Pemeriksaan Mutu Daging &amp; Keamanan Pangan
                 </h1>
-                <p className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-400">
+                <p className="mt-2 max-w-3xl text-sm leading-relaxed text-slate-600">
                   Platform computer vision berbasis ekstraksi ruang warna CIELAB, tekstur GLCM, estimasi biomarker TVB-N terintegrasi, dan rule engine kepatuhan standar mutu pangan.
                 </p>
               </div>
 
               {/* Quick Spec Tags */}
-              <div className="flex flex-wrap items-center gap-2 font-mono text-[11px] text-slate-400">
-                <span className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-1.5 backdrop-blur-md">
+              <div className="flex flex-wrap items-center gap-2 font-mono text-[11px] text-slate-500">
+                <span className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 shadow-xs">
                   CIELAB L*a*b*
                 </span>
-                <span className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-1.5 backdrop-blur-md">
+                <span className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 shadow-xs">
                   GLCM Matrix
                 </span>
-                <span className="rounded-xl border border-white/10 bg-white/[0.03] px-3 py-1.5 backdrop-blur-md">
+                <span className="rounded-xl border border-slate-200 bg-white px-3 py-1.5 shadow-xs">
                   Arrhenius Shelf-Life
                 </span>
               </div>
@@ -437,14 +437,14 @@ export default function App() {
             <div className="glass-card rounded-3xl p-6 sm:p-7">
               <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex items-start gap-3.5">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-cyan-500/15 text-cyan-400 ring-1 ring-cyan-500/30">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-cyan-100 text-cyan-700">
                     <ShieldCheck className="h-6 w-6" aria-hidden="true" />
                   </div>
                   <div>
-                    <h2 className="text-base font-bold text-white sm:text-lg">
+                    <h2 className="text-base font-bold text-slate-900 sm:text-lg">
                       Ambang Batas &amp; Standar Mutu Keamanan Pangan
                     </h2>
-                    <p className="mt-0.5 max-w-xl text-xs leading-relaxed text-slate-400">
+                    <p className="mt-0.5 max-w-xl text-xs leading-relaxed text-slate-500">
                       Klasifikasi keputusan berdasarkan skor indeks kesegaran komposit 0–100 dan aturan hard-override keamanan pangan.
                     </p>
                   </div>
@@ -453,7 +453,7 @@ export default function App() {
                   {['CIELAB', 'GLCM TEXTURE', 'TVB-N KINETICS', 'RULE ENGINE'].map((method) => (
                     <span
                       key={method}
-                      className="rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1 font-bold text-slate-300"
+                      className="rounded-lg border border-slate-200 bg-slate-50 px-2.5 py-1 font-bold text-slate-600"
                     >
                       {method}
                     </span>
@@ -479,10 +479,10 @@ export default function App() {
                           <Icon className="h-4 w-4" aria-hidden="true" />
                         </span>
                       </div>
-                      <div className="mt-2 font-mono text-xs font-bold text-slate-200">
+                      <div className="mt-2 font-mono text-xs font-bold text-slate-800">
                         {item.range}
                       </div>
-                      <p className="mt-1.5 text-xs leading-relaxed text-slate-400">
+                      <p className="mt-1.5 text-xs leading-relaxed text-slate-600">
                         {item.description}
                       </p>
                     </div>
@@ -492,7 +492,7 @@ export default function App() {
             </div>
           </section>
 
-          <footer className="mt-10 border-t border-white/[0.06] pt-6 text-center">
+          <footer className="mt-10 border-t border-slate-200/80 pt-6 text-center">
             <p className="mx-auto max-w-3xl text-[11px] leading-relaxed text-slate-500">
               FreshMeat AI adalah sistem prototipe kecerdasan mutu pangan. Hasil estimasi tidak menggantikan uji laboratorium mikrobiologi dan kimiawi resmi SNI / ISO.
             </p>
@@ -504,17 +504,17 @@ export default function App() {
         <div
           role="status"
           aria-live="polite"
-          className="fixed bottom-6 left-1/2 z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 rounded-2xl border border-emerald-500/30 bg-[#07101c]/95 p-4 shadow-2xl shadow-black/80 backdrop-blur-xl lg:left-auto lg:right-8 lg:translate-x-0"
+          className="fixed bottom-6 left-1/2 z-50 w-[calc(100%-2rem)] max-w-md -translate-x-1/2 rounded-2xl border border-emerald-200 bg-white/95 p-4 shadow-xl shadow-slate-900/10 backdrop-blur-xl lg:left-auto lg:right-8 lg:translate-x-0"
         >
           <div className="flex items-start gap-3">
-            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-300">
+            <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-emerald-700">
               <CheckCircle2 className="h-4 w-4" aria-hidden="true" />
             </div>
             <div className="min-w-0 flex-1">
-              <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-400">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-emerald-700">
                 Notifikasi Sistem
               </div>
-              <div className="mt-0.5 text-xs leading-relaxed text-slate-200">{toast}</div>
+              <div className="mt-0.5 text-xs leading-relaxed text-slate-700">{toast}</div>
             </div>
           </div>
         </div>
