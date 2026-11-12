@@ -6,12 +6,14 @@
 
 html {
   scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  min-height: 100dvh;
   overflow-x: hidden;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   background-color: #f8fafc;
@@ -148,6 +150,20 @@ input[type="search"]::-webkit-search-cancel-button {
 select option {
   background-color: #ffffff;
   color: #0f172a;
+}
+
+/* Target sentuh nyaman dan cegah zoom otomatis iOS pada input */
+@media (max-width: 639px) {
+  button,
+  summary {
+    min-height: 44px;
+  }
+
+  input:not([type="range"]):not([type="checkbox"]):not([type="radio"]),
+  select,
+  textarea {
+    font-size: 16px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

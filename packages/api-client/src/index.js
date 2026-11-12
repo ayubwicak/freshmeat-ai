@@ -12,7 +12,8 @@ export function createApiClient(baseUrl = '') {
     if (batchId) formData.append('batch_id', batchId)
 
     const controller = new AbortController()
-    const timeout = window.setTimeout(() => controller.abort(), 6000)
+    // Jaringan seluler lambat: beri waktu 20 detik sebelum fallback Canvas lokal.
+    const timeout = window.setTimeout(() => controller.abort(), 20000)
 
     try {
       const response = await fetch(`${apiBase}/api/v1/analyze`, {

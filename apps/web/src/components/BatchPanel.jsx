@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { ChevronDown, FolderPlus, Loader2, Plus, X } from 'lucide-react'
+import { ChevronDown, Loader2, Plus, X } from 'lucide-react'
 import { COMMODITIES, commodityShortName } from '@freshmeat/analysis'
 
 const selectClass =
-  'w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 outline-none focus:border-slate-400'
+  'min-h-11 w-full appearance-none rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base text-slate-800 outline-none focus:border-slate-400 sm:min-h-0 sm:py-2 sm:text-xs'
 
 export default function BatchPanel({
   batches,
@@ -51,11 +51,8 @@ export default function BatchPanel({
 
   return (
     <>
-      <section
-        id="batch"
-        className="glass-card mb-6 scroll-mt-20 p-4"
-      >
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <section id="batch" className="glass-card p-4 sm:p-5">
+        <div className="flex flex-col gap-3">
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs font-semibold text-slate-700">Batch Kedatangan Daging</span>
@@ -70,20 +67,22 @@ export default function BatchPanel({
             </div>
             {activeBatch && (
               <div className="mt-0.5 text-xs text-slate-500">
-                {activeBatch.batch_id} · {commodityShortName(activeBatch.commodity)} · {activeBatch.sample_count} sampel diuji
-                {activeBatch.average_score != null && ` · Rata-rata skor: ${activeBatch.average_score}/100`}
+                {activeBatch.batch_id} · {commodityShortName(activeBatch.commodity)} ·{' '}
+                {activeBatch.sample_count} sampel diuji
+                {activeBatch.average_score != null &&
+                  ` · Rata-rata skor: ${activeBatch.average_score}/100`}
               </div>
             )}
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:flex sm:items-center">
             {batches.length > 0 && (
-              <div className="relative">
+              <div className="relative flex-1 sm:flex-none">
                 <select
                   value={activeBatch?.batch_id ?? ''}
                   onChange={(event) => onSelect(event.target.value || null)}
                   aria-label="Pilih batch aktif"
-                  className="appearance-none rounded-lg border border-slate-200 bg-white py-1.5 pl-3 pr-8 text-xs font-medium text-slate-700 hover:border-slate-300"
+                  className="min-h-11 w-full appearance-none rounded-lg border border-slate-200 bg-white py-2.5 pl-3 pr-9 text-base font-medium text-slate-700 hover:border-slate-300 sm:min-h-0 sm:py-1.5 sm:text-xs"
                 >
                   <option value="">Tanpa batch (Mandiri)</option>
                   {batches.map((batch) => (
@@ -99,28 +98,30 @@ export default function BatchPanel({
             <button
               type="button"
               onClick={openModal}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
+              className="inline-flex min-h-11 items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-slate-700 hover:bg-slate-50 sm:w-auto"
             >
-              <Plus className="h-3.5 w-3.5" />
+              <Plus className="h-3.5 w-3.5" aria-hidden="true" />
               <span>Batch Baru</span>
             </button>
           </div>
         </div>
       </section>
 
-      {/* Modal Dialog */}
+      {/* Modal: bottom sheet di HP, dialog di layar besar */}
       {open && (
         <div
           role="dialog"
           aria-modal="true"
           aria-labelledby="batchModalTitle"
-          className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/40 p-4"
+          className="fixed inset-0 z-[60] flex items-end justify-center bg-slate-900/40 sm:items-center sm:p-4"
           onClick={() => !submitting && setOpen(false)}
         >
           <div
-            className="w-full max-w-sm rounded-lg border border-slate-200 bg-white p-5 shadow-lg"
+            className="w-full max-w-sm rounded-t-2xl border border-slate-200 bg-white p-5 pb-[calc(1.25rem+env(safe-area-inset-bottom))] shadow-lg sm:rounded-xl sm:pb-5"
             onClick={(event) => event.stopPropagation()}
           >
+            <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-slate-200 sm:hidden" />
+
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <h3 id="batchModalTitle" className="text-sm font-bold text-slate-900">
                 Tambah Batch Baru
@@ -129,7 +130,7 @@ export default function BatchPanel({
                 type="button"
                 onClick={() => setOpen(false)}
                 disabled={submitting}
-                className="text-slate-400 hover:text-slate-700"
+                className="flex h-11 w-11 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-50 hover:text-slate-700"
                 aria-label="Tutup formulir batch"
               >
                 <X className="h-4 w-4" />
@@ -139,7 +140,7 @@ export default function BatchPanel({
             <form onSubmit={submit} className="mt-4 space-y-3">
               <div>
                 <label htmlFor="batchName" className="mb-1 block text-xs font-medium text-slate-700">
-                  Nama Batch <span className="text-slate-400 font-normal">(opsional)</span>
+                  Nama Batch <span className="font-normal text-slate-400">(opsional)</span>
                 </label>
                 <input
                   id="batchName"
@@ -149,12 +150,15 @@ export default function BatchPanel({
                   placeholder="Misal: Batch Kedatangan #104"
                   maxLength={80}
                   autoFocus
-                  className="w-full rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-800 outline-none focus:border-slate-400"
+                  className="min-h-11 w-full rounded-lg border border-slate-200 px-3 py-2.5 text-base text-slate-800 outline-none focus:border-slate-400 sm:min-h-0 sm:py-2 sm:text-xs"
                 />
               </div>
 
               <div>
-                <label htmlFor="batchCommodity" className="mb-1 block text-xs font-medium text-slate-700">
+                <label
+                  htmlFor="batchCommodity"
+                  className="mb-1 block text-xs font-medium text-slate-700"
+                >
                   Komoditas Daging
                 </label>
                 <select
@@ -177,19 +181,19 @@ export default function BatchPanel({
                 </p>
               )}
 
-              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+              <div className="flex justify-end gap-2 border-t border-slate-100 pt-3">
                 <button
                   type="button"
                   onClick={() => setOpen(false)}
                   disabled={submitting}
-                  className="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                  className="min-h-11 rounded-lg border border-slate-200 px-4 py-2.5 text-xs font-medium text-slate-700 hover:bg-slate-50"
                 >
                   Batal
                 </button>
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="inline-flex items-center gap-1.5 rounded-lg bg-slate-900 px-4 py-1.5 text-xs font-medium text-white hover:bg-slate-800 disabled:opacity-50"
+                  className="inline-flex min-h-11 items-center gap-1.5 rounded-lg bg-slate-900 px-4 py-2.5 text-xs font-medium text-white hover:bg-slate-800 disabled:opacity-50"
                 >
                   {submitting && <Loader2 className="h-3.5 w-3.5 animate-spin" />}
                   <span>Simpan</span>
