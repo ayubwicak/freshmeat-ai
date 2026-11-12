@@ -5,6 +5,7 @@ import AuditTable from './components/AuditTable.jsx'
 import BatchPanel from './components/BatchPanel.jsx'
 import BottomNav, { TABS } from './components/BottomNav.jsx'
 import DiagnosisPanel from './components/DiagnosisPanel.jsx'
+import InstallCard from './components/InstallCard.jsx'
 import ParameterPanel from './components/ParameterPanel.jsx'
 import PresetBar from './components/PresetBar.jsx'
 import ScannerPanel from './components/ScannerPanel.jsx'
@@ -461,6 +462,8 @@ export default function App() {
           aria-label="Informasi aplikasi"
           className={activeTab === 'info' ? 'space-y-4 pt-4' : 'hidden'}
         >
+          <InstallCard />
+
           <div className="glass-card p-5">
             <div className="border-b border-slate-100 pb-3">
               <h2 className="text-sm font-bold text-slate-900">
