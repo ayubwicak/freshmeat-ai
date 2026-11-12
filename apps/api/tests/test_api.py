@@ -61,6 +61,17 @@ def test_inspection_history_limit_is_validated(client, limit):
     assert response.status_code == 422
 
 
+def test_fresh_marbled_wagyu_is_grade_a(client, fresh_wagyu_jpeg):
+    result = analyze(client, fresh_wagyu_jpeg)
+
+    assert result["classification"] == "GRADE_A_FRESH"
+    assert result["scores"]["total_freshness_score"] >= 80
+    assert result["triggered_rules"] == []
+    assert result["cielab_features"]["a_star"] > 25
+    assert result["cielab_features"]["marbling_ratio_pct"] > 10
+    assert result["cielab_features"]["discoloration_ratio_pct"] < 18
+
+
 def test_rule_01_spoiled_meat_is_rejected(client, fresh_meat_jpeg):
     result = analyze(
         client,

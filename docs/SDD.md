@@ -23,12 +23,13 @@ Sistem menggunakan pendekatan **Modular Edge-First Architecture** di dalam **mon
    - Parameter kontekstual: komoditas (sapi, ayam, ikan, kambing), suhu penyimpanan (°C), durasi paparan (jam), kondisi permukaan, dan indikator aroma.
 2. **Pre-processing & ROI Extraction**
    - Normalisasi ukuran citra (backend 480 × 360; Canvas lokal 480 × 300) dan konversi ruang warna.
-   - Segmentasi jaringan otot dari latar belakang/wadah menggunakan HSV threshold dan operasi morfologi.
+   - Segmentasi jaringan otot dari latar belakang/wadah menggunakan HSV threshold pada rentang hue merah/pink/cokelat, lalu kontur terbesar diisi agar marbling putih di dalam steak ikut masuk ROI.
+   - Pemisahan piksel otot dari lemak/marbling dan latar putih sebelum ekstraksi fitur. Lemak wagyu (L\* tinggi, a\* rendah) tidak dihitung sebagai diskolorasi atau pantulan air.
    - Fallback ROI area tengah bila mask terlalu kecil.
 3. **Feature Extraction & Biomarker Engine**
-   - **CIELAB:** L\*, a\*, b\*, chroma, hue angle, rasio diskolorasi, estimasi oksimioglobin.
+   - **CIELAB:** L\*, a\*, b\*, chroma, hue angle, rasio diskolorasi otot, estimasi oksimioglobin, dan rasio marbling.
    - **GLCM:** contrast, homogeneity, energy, correlation (d = 1, arah 0°).
-   - **Specular Wetness Index:** proporsi piksel sangat terang dengan saturasi rendah pada ROI.
+   - **Specular Wetness Index:** proporsi piksel sangat terang dengan saturasi rendah pada ROI, tidak menghitung lemak marbling.
 4. **Decision Fusion & Shelf-Life Estimator**
    - Pembobotan skor warna, tekstur, suhu, dan aroma.
    - Hard override rules untuk mencegah false negative.
@@ -93,18 +94,18 @@ S_total = (0.45 × S_warna) + (0.25 × S_tekstur) + (0.20 × S_suhu) + (0.10 × 
 
 Setiap komponen berada pada rentang 0–100.
 
-- **S_warna:** diturunkan dari estimasi oksimioglobin dan nilai a\* CIELAB (backend) atau rasio kanal merah (mode lokal).
+- **S_warna:** diturunkan dari estimasi oksimioglobin dan nilai a\* CIELAB pada piksel otot saja (backend) atau rasio kanal merah otot (mode lokal). Lemak marbling dikeluarkan agar daging wagyu tidak dianggap pucat.
 - **S_tekstur:** diturunkan dari specular wetness, homogeneity GLCM, serta kondisi permukaan (`normal`, `wet`, `slimy`).
 - **S_suhu:** penalti kinetika termal (pendekatan Q10) berdasarkan suhu dan durasi paparan.
 - **S_aroma:** pemetaan indikator aroma (`fresh` = 98, `neutral` = 60, `ammonia` = 5).
 
 ### 3.2 Hard Override Rules
 
-**RULE-01 — Deteksi Pembusukan Lanjut:** jika permukaan berlendir, aroma amonia, atau rasio diskolorasi > 18%, skor total dibatasi maksimum 20.
+**RULE-01 — Deteksi Pembusukan Lanjut:** jika permukaan berlendir, aroma amonia, atau rasio diskolorasi otot > 18% disertai a\* < 30 (otot benar-benar kehilangan rona merah), skor total dibatasi maksimum 20. Marbling putih tidak dihitung sebagai diskolorasi.
 
 **RULE-02 — Zona Bahaya Termal:** jika suhu ≥ 25 °C dan paparan > 8 jam, skor total dibatasi maksimum 58.
 
-**RULE-03 — Indikasi Daging Gelonggongan:** jika komoditas sapi, permukaan sangat berair atau specular wetness > 38%, dan L\* > 48, skor total dibatasi maksimum 48.
+**RULE-03 — Indikasi Daging Gelonggongan:** jika komoditas sapi, permukaan sangat berair (atau specular wetness > 25% pada otot dengan chroma < 30), **dan** otot tampak pucat (L\* > 52 dengan a\* < 30 atau chroma < 34), skor total dibatasi maksimum 48. Daging merah pekat yang lembap/berkilap seperti wagyu segar tidak ikut terpicu.
 
 ### 3.3 Matriks Klasifikasi Output
 
@@ -213,6 +214,7 @@ Suite pengujian menggunakan pytest dan FastAPI TestClient. Test domain berada di
 
 - **Endpoint:** health check, penyajian frontend React hasil build, validasi unggahan bukan gambar.
 - **Klasifikasi:** batas Grade A (≥ 80), Grade B (55–79,9), dan Reject (< 55).
+- **Regresi marbling:** citra wagyu segar bermarbling tinggi harus tetap Grade A tanpa RULE-01/RULE-03.
 - **Hard override:** RULE-01, RULE-02, RULE-03, termasuk batas nilai agar tidak terpicu dini.
 - **Kualitas fitur:** nilai a\* CIELAB, homogeneity GLCM, dan struktur respons API.
 - **Persistensi:** hasil analisis tersimpan dan dapat diambil kembali melalui riwayat, termasuk validasi batas `limit`.
@@ -235,6 +237,15 @@ Workflow GitHub Actions (`.github/workflows/ci.yml`) menjalankan lint Ruff, buil
 - Penggunaan alat bantu AI, pustaka, dataset, dan referensi eksternal wajib didokumentasikan sesuai aturan lomba/kompetisi yang berlaku. Jangan menyembunyikan atribusi yang diminta panitia.
 - Data uji sebaiknya disertai sumber dan izin penggunaan.
 - Sistem tidak boleh dipresentasikan sebagai alat diagnosis medis atau pengganti uji laboratorium resmi.
+
+### 8.1 Aturan Git & Kontribusi AI
+
+- `git commit` dan `git push` hanya boleh dilakukan setelah ada perintah eksplisit dari anggota tim. Tanpa perintah tersebut, perubahan tetap berada di working tree.
+- Eksekusi perintah git hanya boleh dilakukan setelah perintah eksplisit tersebut, dan commit tetap atas nama anggota tim manusia.
+- AI tidak boleh dicantumkan sebagai author, co-author, committer, maupun kontributor pada commit atau push.
+- Dilarang menambahkan trailer atribusi AI pada pesan commit, termasuk `Co-authored-by` yang merujuk ke AI.
+- Identitas author dan committer wajib menggunakan nama serta email asli anggota tim.
+- AI hanya boleh membantu menyiapkan perubahan, analisis, dan draft pesan commit; keputusan akhir tetap berada pada anggota tim.
 
 ## 9. Batasan & Pengembangan Lanjutan
 

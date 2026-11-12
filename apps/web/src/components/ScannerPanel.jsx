@@ -25,7 +25,7 @@ export default function ScannerPanel({
     : `${metrics.oxidation}%`
   const moistureText = isBackend
     ? `GLCM: ${Number(metrics.homogeneity).toFixed(2)}`
-    : `${metrics.specularity > 38 ? 'Tinggi' : 'Normal'} (${metrics.specularity}%)`
+    : `${metrics.specularity > 25 ? 'Tinggi' : 'Normal'} (${metrics.specularity}%)`
 
   return (
     <div className="glass-card p-5">

@@ -56,7 +56,7 @@ def evaluate_scores(
         np.clip(cielab["oxymyoglobin_pct"] + (cielab["a_star"] * 0.4), 10.0, 99.0)
     )
 
-    base_texture = 92.0 - (glcm["specularity_wetness_pct"] * 0.45)
+    base_texture = 94.0 - (glcm["specularity_wetness_pct"] * 0.6)
     if surface == "wet":
         base_texture = min(base_texture, 54.0)
     elif surface == "slimy":
@@ -126,10 +126,19 @@ def apply_safety_rules(
     )
     commodity_name = (commodity or "").strip().lower()
 
+    discoloration = cielab.get("discoloration_ratio_pct", 0.0)
+    a_star = cielab.get("a_star", 99.0)
+    chroma = cielab.get("chroma", 99.0)
+    lightness = cielab.get("L_star", 0.0)
+    specularity = glcm.get("specularity_wetness_pct", 0.0)
+
+    # Diskolorasi hanya dipercaya jika otot memang kehilangan rona merah.
+    # Marbling putih wagyu sudah dikeluarkan dari perhitungan di vision.py,
+    # dan guard a* ini mencegah daging merah segar ikut ter-reject.
     if (
         surface == "slimy"
         or aroma == "ammonia"
-        or cielab["discoloration_ratio_pct"] > 18.0
+        or (discoloration > 18.0 and a_star < 30.0)
     ):
         total = min(total, 20.0)
         triggered.append(
@@ -144,15 +153,17 @@ def apply_safety_rules(
             "> 25C selama lebih dari 8 jam)."
         )
 
-    if (
-        "sapi" in commodity_name
-        and (surface == "wet" or glcm["specularity_wetness_pct"] > 38.0)
-        and cielab["L_star"] > 48.0
-    ):
+    # Gelonggongan ditandai otot yang pucat (a*/chroma rendah) sekaligus
+    # permukaan berair. Daging segar berwarna merah pekat tetap lolos meskipun
+    # permukaannya lembap/berkilap seperti wagyu.
+    pale_muscle = lightness > 52.0 and (a_star < 30.0 or chroma < 34.0)
+    wet_signal = surface == "wet" or (specularity > 25.0 and chroma < 30.0)
+
+    if "sapi" in commodity_name and wet_signal and pale_muscle:
         total = min(total, 48.0)
         triggered.append(
-            "RULE-03: Indikasi Anomali Daging Gelonggongan (Luminansi L* pucat "
-            "disertai indeks air permukaan tinggi)."
+            "RULE-03: Indikasi Anomali Daging Gelonggongan (Otot pucat dengan "
+            "a*/chroma rendah disertai indeks air permukaan tinggi)."
         )
 
     scores["total_freshness_score"] = round(total, 1)
