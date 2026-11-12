@@ -22,8 +22,7 @@ export function exportAuditJson(logs) {
 
 export function printCertificate(result, logs = []) {
   if (!result) {
-    window.alert('Belum ada hasil inspeksi untuk dicetak.')
-    return
+    return { ok: false, message: 'Belum ada hasil inspeksi untuk dicetak.' }
   }
 
   const certificateId = logs[0]?.id ?? result.inspectionId
@@ -38,8 +37,10 @@ export function printCertificate(result, logs = []) {
 
   const win = window.open('', '_blank')
   if (!win) {
-    window.alert('Popup diblokir browser. Izinkan popup untuk mencetak sertifikat.')
-    return
+    return {
+      ok: false,
+      message: 'Popup diblokir browser. Izinkan popup untuk mencetak sertifikat.',
+    }
   }
 
   win.document.write(
@@ -84,4 +85,5 @@ export function printCertificate(result, logs = []) {
   win.document.close()
   win.focus()
   window.setTimeout(() => win.print(), 350)
+  return { ok: true }
 }

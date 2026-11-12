@@ -2,7 +2,7 @@ import { Loader2 } from 'lucide-react'
 import { AROMAS, COMMODITIES, SURFACES, temperatureZone } from '@freshmeat/analysis'
 
 const selectClass =
-  'w-full rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-800 outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400'
+  'min-h-11 w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-base text-slate-800 outline-none focus:border-slate-400 focus:ring-1 focus:ring-slate-400 sm:min-h-0 sm:py-2 sm:text-xs'
 
 export default function ParameterPanel({ batch, form, scanning, onChange, onScan }) {
   return (
@@ -60,7 +60,7 @@ export default function ParameterPanel({ batch, form, scanning, onChange, onScan
             value={form.temp}
             aria-label="Suhu penyimpanan"
             onChange={(event) => onChange({ temp: Number(event.target.value) })}
-            className="w-full accent-slate-900 cursor-pointer"
+            className="h-11 w-full cursor-pointer accent-slate-900"
           />
           <div className="mt-0.5 flex justify-between text-[10px] text-slate-400">
             <span>-18°C (Beku)</span>
@@ -88,7 +88,7 @@ export default function ParameterPanel({ batch, form, scanning, onChange, onScan
             value={form.hours}
             aria-label="Durasi paparan udara"
             onChange={(event) => onChange({ hours: Number(event.target.value) })}
-            className="w-full accent-slate-900 cursor-pointer"
+            className="h-11 w-full cursor-pointer accent-slate-900"
           />
           <div className="mt-0.5 flex justify-between text-[10px] text-slate-400">
             <span>0 Jam (Baru)</span>
@@ -141,7 +141,7 @@ export default function ParameterPanel({ batch, form, scanning, onChange, onScan
           type="button"
           onClick={onScan}
           disabled={scanning}
-          className="w-full rounded-lg bg-slate-900 py-2.5 text-xs font-semibold text-white hover:bg-slate-800 disabled:opacity-60 transition-colors"
+          className="min-h-12 w-full rounded-xl bg-slate-900 py-3 text-sm font-semibold text-white transition-colors hover:bg-slate-800 disabled:opacity-60"
         >
           {scanning ? (
             <span className="flex items-center justify-center gap-2">

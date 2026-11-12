@@ -100,10 +100,10 @@ export default function App() {
     resultRef.current = result
   }, [result])
 
-  const notify = useCallback((message) => {
-    setToast(message)
+  const notify = useCallback((message, tone = 'info') => {
+    setToast({ message, tone })
     if (toastTimer.current) window.clearTimeout(toastTimer.current)
-    toastTimer.current = window.setTimeout(() => setToast(null), 2800)
+    toastTimer.current = window.setTimeout(() => setToast(null), 3200)
   }, [])
 
   useEffect(
@@ -120,7 +120,7 @@ export default function App() {
     }
     const handleOffline = () => {
       setOnline(false)
-      notify('Anda offline · analisis lokal tetap dapat dipakai.')
+      notify('Anda offline · analisis lokal tetap dapat dipakai.', 'warning')
     }
 
     window.addEventListener('online', handleOnline)
@@ -181,6 +181,7 @@ export default function App() {
       setScanning(false)
       appendLog(resultRef.current)
       notify('Skenario demo dimuat · rekaman lokal masuk riwayat sesi.')
+      setActiveTab('hasil')
       scanTimer.current = null
     }, 900)
   }, [appendLog, clearScanTimer, notify])
@@ -276,7 +277,7 @@ export default function App() {
       image = await loadImage(file)
     } catch (error) {
       console.warn('Gagal membaca gambar:', error)
-      window.alert('File gambar tidak dapat dibaca. Gunakan format JPG/PNG yang valid.')
+      notify('File gambar tidak dapat dibaca. Gunakan format JPG/PNG yang valid.', 'error')
       return
     }
 
@@ -330,7 +331,10 @@ export default function App() {
         batchId: batchAtUpload?.batch_id ?? null,
         batchName: batchAtUpload?.name ?? null,
       })
-      notify('Backend tidak aktif · hasil lokal ditampilkan, belum tersimpan ke SQLite.')
+      notify(
+        'Backend tidak aktif · hasil lokal ditampilkan, belum tersimpan ke SQLite.',
+        'warning',
+      )
       if (!keepScanning) setActiveTab('hasil')
     } finally {
       if (!keepScanning && uploadId === requestSeq.current) setScanning(false)
@@ -358,7 +362,10 @@ export default function App() {
     )
   }
 
-  const handlePrint = () => printCertificate(result, auditLogs)
+  const handlePrint = () => {
+    const outcome = printCertificate(result, auditLogs)
+    if (!outcome.ok) notify(outcome.message, 'warning')
+  }
   const handleExport = () => exportAuditJson(auditLogs)
   const activeTabMeta = TABS.find((tab) => tab.id === activeTab) ?? TABS[0]
 
@@ -495,10 +502,32 @@ export default function App() {
         <div
           role="status"
           aria-live="polite"
-          className="fixed inset-x-4 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-50 mx-auto max-w-sm rounded-lg border border-slate-200 bg-white p-3 text-xs shadow-lg sm:inset-x-auto sm:right-6"
+          className={[
+            'fixed inset-x-4 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-50 mx-auto max-w-sm rounded-lg border bg-white p-3 text-xs shadow-lg sm:inset-x-auto sm:right-6',
+            toast.tone === 'error'
+              ? 'border-rose-200'
+              : toast.tone === 'warning'
+                ? 'border-amber-200'
+                : 'border-slate-200',
+          ].join(' ')}
         >
-          <div className="font-semibold text-slate-900">Notifikasi</div>
-          <div className="mt-0.5 text-slate-600">{toast}</div>
+          <div
+            className={[
+              'font-semibold',
+              toast.tone === 'error'
+                ? 'text-rose-800'
+                : toast.tone === 'warning'
+                  ? 'text-amber-800'
+                  : 'text-slate-900',
+            ].join(' ')}
+          >
+            {toast.tone === 'error'
+              ? 'Gagal'
+              : toast.tone === 'warning'
+                ? 'Perhatian'
+                : 'Notifikasi'}
+          </div>
+          <div className="mt-0.5 text-slate-600">{toast.message}</div>
         </div>
       )}
     </div>

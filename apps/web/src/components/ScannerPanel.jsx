@@ -1,4 +1,4 @@
-import { Camera, Upload } from 'lucide-react'
+import { Camera, ImagePlus, Info, Loader2 } from 'lucide-react'
 import { TONES } from '../lib/tones.js'
 
 export default function ScannerPanel({
@@ -28,50 +28,79 @@ export default function ScannerPanel({
     : `${metrics.specularity > 25 ? 'Tinggi' : 'Normal'} (${metrics.specularity}%)`
 
   return (
-    <div className="glass-card p-5">
-      {/* Header bar */}
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-4">
+    <div className="glass-card p-4 sm:p-5">
+      <div className="flex items-center justify-between gap-2">
         <div>
-          <h2 className="text-sm font-bold text-slate-900">
-            Citra Spesimen &amp; Analisis Visual
-          </h2>
-          <p className="text-xs text-slate-500">
-            Ekstraksi fitur warna CIELAB dan tekstur permukaan
-          </p>
+          <h2 className="text-sm font-bold text-slate-900">Citra Spesimen</h2>
+          <p className="text-xs text-slate-500">Ekstraksi warna CIELAB dan tekstur GLCM</p>
         </div>
-
-        {/* Quick upload & camera actions */}
-        <div className="flex items-center gap-2">
-          <label className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 hover:bg-slate-50">
-            <Camera className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>Kamera</span>
-            <input
-              type="file"
-              id="cameraInput"
-              accept="image/*"
-              capture="environment"
-              className="hidden"
-              onChange={handleFiles}
-            />
-          </label>
-          <label className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-slate-900 px-3.5 py-1.5 text-xs font-medium text-white hover:bg-slate-800">
-            <Upload className="h-3.5 w-3.5" aria-hidden="true" />
-            <span>Unggah Foto</span>
-            <input
-              type="file"
-              id="imageUpload"
-              accept="image/*"
-              multiple
-              className="hidden"
-              onChange={handleFiles}
-            />
-          </label>
-        </div>
+        <span
+          className={[
+            'shrink-0 rounded-full px-2.5 py-1 text-[10px] font-semibold',
+            scanning
+              ? 'bg-emerald-100 text-emerald-700'
+              : 'bg-slate-100 text-slate-600',
+          ].join(' ')}
+          aria-live="polite"
+        >
+          {scanning ? 'Menganalisis…' : 'Siap'}
+        </span>
       </div>
 
-      {/* Viewport Canvas */}
+      {/* Aksi utama kamera-first */}
+      <div className="mt-4 grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <label
+          className={[
+            'flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold text-white transition-colors',
+            scanning
+              ? 'cursor-wait bg-slate-500'
+              : 'bg-slate-900 hover:bg-slate-800',
+          ].join(' ')}
+        >
+          {scanning ? (
+            <Loader2 className="h-5 w-5 animate-spin" aria-hidden="true" />
+          ) : (
+            <Camera className="h-5 w-5" aria-hidden="true" />
+          )}
+          <span>{scanning ? 'Memproses…' : 'Ambil Foto'}</span>
+          <input
+            type="file"
+            id="cameraInput"
+            accept="image/*"
+            capture="environment"
+            className="hidden"
+            onChange={handleFiles}
+            disabled={scanning}
+          />
+        </label>
+
+        <label className="flex min-h-12 cursor-pointer items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition-colors hover:bg-slate-50">
+          <ImagePlus className="h-5 w-5" aria-hidden="true" />
+          <span>Galeri</span>
+          <input
+            type="file"
+            id="imageUpload"
+            accept="image/*"
+            multiple
+            className="hidden"
+            onChange={handleFiles}
+            disabled={scanning}
+          />
+        </label>
+      </div>
+
+      {/* Tips singkat memotret */}
+      <div className="mt-3 flex items-start gap-2 rounded-lg border border-emerald-100 bg-emerald-50/70 px-3 py-2 text-[11px] leading-relaxed text-emerald-900">
+        <Info className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+        <p>
+          Gunakan cahaya terang, jarak 15–20 cm, dan pastikan permukaan daging
+          memenuhi area kotak. Pilih Galeri untuk memproses beberapa foto sekaligus.
+        </p>
+      </div>
+
+      {/* Viewport Canvas harus selalu ter-mount untuk analisis lokal */}
       <div className="mt-4">
-        <div className="relative overflow-hidden rounded-lg bg-slate-950">
+        <div className="relative overflow-hidden rounded-xl bg-slate-950">
           <canvas
             id="meatCanvas"
             ref={canvasRef}
@@ -80,10 +109,8 @@ export default function ScannerPanel({
             className="block h-auto w-full"
           />
 
-          {/* Laser scanning beam */}
           <div id="scannerLine" className={`scanner-line ${scanning ? 'active' : ''}`} />
 
-          {/* Functional ROI Box */}
           <div
             id="roiBox"
             className="roi-box"
@@ -104,41 +131,50 @@ export default function ScannerPanel({
           </div>
         </div>
 
-        {/* Live Telemetry Sensor Cards */}
-        <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
-          <div className="rounded-lg border border-slate-200 bg-slate-50/50 p-3">
-            <div className="text-[11px] font-medium text-slate-500">
-              {isBackend ? 'CIELAB a* (Red Chroma)' : 'Rasio Warna Merah'}
+        {/* Metrik ringkas 3 kolom */}
+        <div className="mt-3 grid grid-cols-3 gap-2">
+          <div className="min-w-0 rounded-lg border border-slate-200 bg-slate-50/50 p-2.5 sm:p-3">
+            <div className="truncate text-[10px] font-medium text-slate-500 sm:text-[11px]">
+              {isBackend ? 'CIELAB a*' : 'Rasio Merah'}
             </div>
-            <div id="metricRedRatio" className="mt-1 text-xl font-bold tabular-nums text-slate-900">
+            <div
+              id="metricRedRatio"
+              className="mt-0.5 truncate text-sm font-bold tabular-nums text-slate-900 sm:text-xl"
+            >
               {redText}
             </div>
-            <div className="mt-0.5 text-[10px] text-slate-400">
-              {isBackend ? 'Indikator pigmen mioglobin' : 'Kerapatan rona merah'}
+            <div className="mt-0.5 hidden text-[10px] text-slate-400 sm:block">
+              {isBackend ? 'Pigmen mioglobin' : 'Kerapatan rona merah'}
             </div>
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-slate-50/50 p-3">
-            <div className="text-[11px] font-medium text-slate-500">
-              {isBackend ? 'Diskolorasi Cokelat' : 'Indeks Oksidasi'}
+          <div className="min-w-0 rounded-lg border border-slate-200 bg-slate-50/50 p-2.5 sm:p-3">
+            <div className="truncate text-[10px] font-medium text-slate-500 sm:text-[11px]">
+              {isBackend ? 'Diskolorasi' : 'Oksidasi'}
             </div>
-            <div id="metricOxidation" className="mt-1 text-xl font-bold tabular-nums text-slate-900">
+            <div
+              id="metricOxidation"
+              className="mt-0.5 truncate text-sm font-bold tabular-nums text-slate-900 sm:text-xl"
+            >
               {oxidationText}
             </div>
-            <div className="mt-0.5 text-[10px] text-slate-400">
+            <div className="mt-0.5 hidden text-[10px] text-slate-400 sm:block">
               Akumulasi metmyoglobin
             </div>
           </div>
 
-          <div className="rounded-lg border border-slate-200 bg-slate-50/50 p-3">
-            <div className="text-[11px] font-medium text-slate-500">
-              {isBackend ? 'Homogenitas GLCM' : 'Kelembapan Permukaan'}
+          <div className="min-w-0 rounded-lg border border-slate-200 bg-slate-50/50 p-2.5 sm:p-3">
+            <div className="truncate text-[10px] font-medium text-slate-500 sm:text-[11px]">
+              {isBackend ? 'Homogenitas' : 'Kelembapan'}
             </div>
-            <div id="metricMoisture" className="mt-1 text-xl font-bold tabular-nums text-slate-900">
+            <div
+              id="metricMoisture"
+              className="mt-0.5 truncate text-sm font-bold tabular-nums text-slate-900 sm:text-xl"
+            >
               {moistureText}
             </div>
-            <div className="mt-0.5 text-[10px] text-slate-400">
-              {isBackend ? 'Keteraturan serat jaringan' : 'Pantulan spekular'}
+            <div className="mt-0.5 hidden text-[10px] text-slate-400 sm:block">
+              {isBackend ? 'Keteraturan serat' : 'Pantulan spekular'}
             </div>
           </div>
         </div>
