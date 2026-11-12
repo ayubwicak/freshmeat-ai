@@ -10,6 +10,7 @@ import ParameterPanel from './components/ParameterPanel.jsx'
 import PresetBar from './components/PresetBar.jsx'
 import ScannerPanel from './components/ScannerPanel.jsx'
 import { analyzeImage, createBatch, fetchBatches, fetchHistory } from './lib/api.js'
+import { compressImage } from './lib/image.js'
 import {
   DEFAULT_METRICS,
   INITIAL_FORM,
@@ -294,7 +295,8 @@ export default function App() {
     setScanning(true)
 
     try {
-      const data = await analyzeImage(file, form, batchAtUpload?.batch_id ?? null)
+      const uploadFile = await compressImage(file)
+      const data = await analyzeImage(uploadFile, form, batchAtUpload?.batch_id ?? null)
       if (uploadId !== requestSeq.current) return
 
       const mapped = mapBackendResult(data)
