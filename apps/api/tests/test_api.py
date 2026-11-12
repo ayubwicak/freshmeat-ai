@@ -217,3 +217,31 @@ def test_unknown_batch_is_rejected_before_analysis(client, fresh_meat_jpeg):
         },
     )
     assert response.status_code == 404
+
+
+def test_pwa_manifest_is_served(client):
+    response = client.get("/manifest.webmanifest")
+    assert response.status_code == 200
+
+    manifest = response.json()
+    assert manifest["display"] == "standalone"
+    assert manifest["theme_color"].lower() == "#0f172a"
+
+    sizes = {icon["sizes"] for icon in manifest["icons"]}
+    assert {"192x192", "512x512"} <= sizes
+    assert any(icon.get("purpose") == "maskable" for icon in manifest["icons"])
+
+
+def test_service_worker_is_served(client):
+    response = client.get("/sw.js")
+    assert response.status_code == 200
+    assert "javascript" in response.headers["content-type"]
+    assert "self.addEventListener" in response.text
+    assert "/api/" in response.text
+
+
+def test_pwa_icon_is_served(client):
+    response = client.get("/icons/icon-192.png")
+    assert response.status_code == 200
+    assert response.headers["content-type"] == "image/png"
+    assert response.content.startswith(b"\x89PNG\r\n\x1a\n")

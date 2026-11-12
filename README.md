@@ -59,6 +59,12 @@ npm run dev
 
 Buka `http://localhost:5173`. Vite mem-proxy `/api` ke `http://127.0.0.1:8000`. Jika backend tidak tersedia, aplikasi otomatis memakai analisis Canvas lokal.
 
+## Aplikasi Mobile
+
+Frontend memakai tata letak mobile-first dengan lima tab (Periksa, Hasil, Riwayat, Batch, Info), tombol kamera/galeri berukuran sentuh, serta riwayat berbentuk kartu di layar kecil. Build produksi dapat dipasang sebagai PWA dan memiliki app shell offline; analisis tetap jatuh ke Canvas lokal saat backend tidak tersedia.
+
+Panduan lengkap—termasuk syarat HTTPS, tunnel `cloudflared`/`ngrok`, instalasi PWA di Android/iOS, konfigurasi `VITE_API_BASE`/`FRESHMEAT_CORS_ORIGINS`, dan pembuatan APK dengan Capacitor—ada di [`docs/MOBILE.md`](docs/MOBILE.md).
+
 ## Perintah
 
 ```bash
@@ -126,6 +132,7 @@ curl -X POST http://localhost:8000/api/v1/analyze \
 
 - `docs/SDD.md` — desain sistem, rumus, rules, pengujian, serta aturan Git dan kontribusi AI.
 - `docs/ARCHITECTURE.md` — monorepo, dependency graph, dan alur runtime.
+- `docs/MOBILE.md` — PWA, HTTPS, tunnel, CORS, dan pembuatan APK Capacitor.
 - `infra/README.md` — deployment Docker/Nginx.
 
 ## Catatan
