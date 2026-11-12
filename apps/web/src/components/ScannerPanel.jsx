@@ -25,7 +25,9 @@ export default function ScannerPanel({
     : `${metrics.oxidation}%`
   const moistureText = isBackend
     ? `GLCM: ${Number(metrics.homogeneity).toFixed(2)}`
-    : `${metrics.specularity > 25 ? 'Tinggi' : 'Normal'} (${metrics.specularity}%)`
+    : metrics.specularity > 25
+      ? 'Tinggi'
+      : 'Normal'
 
   return (
     <div className="glass-card p-4 sm:p-5">
@@ -174,7 +176,7 @@ export default function ScannerPanel({
               {moistureText}
             </div>
             <div className="mt-0.5 hidden text-[10px] text-slate-400 sm:block">
-              {isBackend ? 'Keteraturan serat' : 'Pantulan spekular'}
+              {isBackend ? 'Keteraturan serat' : `Pantulan ${metrics.specularity}%`}
             </div>
           </div>
         </div>

@@ -1,12 +1,29 @@
 /* FreshMeat AI service worker: app shell offline, API tetap selalu jaringan. */
 const CACHE = 'freshmeat-shell-v1'
 
-const APP_SHELL = [
-  '/',
+const STATIC_ASSETS = [
   '/manifest.webmanifest',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
+  '/icons/icon-maskable-512.png',
 ]
+
+async function precacheShell() {
+  const cache = await caches.open(CACHE)
+  const index = await fetch('/')
+  if (!index.ok) throw new Error('Gagal mengambil app shell')
+
+  const html = await index.clone().text()
+  await cache.put('/', index)
+
+  // Vite memberi nama hash pada aset; ambil URL aktual dari index.html.
+  const assets = Array.from(
+    html.matchAll(/(?:src|href)="(\/assets\/[^"]+)"/g),
+    (match) => match[1],
+  )
+  await cache.addAll(assets)
+  await cache.addAll(STATIC_ASSETS)
+}
 
 const NEVER_CACHE = ['/api/', '/health', '/docs']
 
@@ -17,12 +34,7 @@ function isNeverCache(url) {
 }
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches
-      .open(CACHE)
-      .then((cache) => cache.addAll(APP_SHELL))
-      .then(() => self.skipWaiting()),
-  )
+  event.waitUntil(precacheShell().then(() => self.skipWaiting()))
 })
 
 self.addEventListener('activate', (event) => {
@@ -62,8 +74,8 @@ self.addEventListener('fetch', (event) => {
         .catch(async () => {
           const cache = await caches.open(CACHE)
           return (
-            (await cache.match(request)) ||
-            (await cache.match('/')) ||
+            (await cache.match(request, { ignoreVary: true })) ||
+            (await cache.match('/', { ignoreVary: true })) ||
             Response.error()
           )
         }),
@@ -75,7 +87,7 @@ self.addEventListener('fetch', (event) => {
   event.respondWith(
     (async () => {
       const cache = await caches.open(CACHE)
-      const cached = await cache.match(request)
+      const cached = await cache.match(request, { ignoreVary: true })
 
       const network = fetch(request)
         .then((response) => {

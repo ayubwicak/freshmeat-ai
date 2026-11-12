@@ -55,7 +55,7 @@ export default function AuditTable({ logs, onExport, onPrint }) {
               <button
                 type="button"
                 onClick={() => setQuery('')}
-                className="absolute right-1 top-1/2 flex h-9 w-9 min-h-0 -translate-y-1/2 items-center justify-center rounded-md text-slate-400 hover:text-slate-600"
+                className="absolute right-0 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-md text-slate-400 hover:text-slate-600"
                 aria-label="Hapus pencarian"
               >
                 <X className="h-3.5 w-3.5" />
