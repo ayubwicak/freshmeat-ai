@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { AlertTriangle, CheckCircle2, ShieldCheck, XCircle } from 'lucide-react'
+import AppBar from './components/AppBar.jsx'
 import AuditTable from './components/AuditTable.jsx'
 import BatchPanel from './components/BatchPanel.jsx'
+import BottomNav, { TABS } from './components/BottomNav.jsx'
 import DiagnosisPanel from './components/DiagnosisPanel.jsx'
-import Header from './components/Header.jsx'
 import ParameterPanel from './components/ParameterPanel.jsx'
 import PresetBar from './components/PresetBar.jsx'
 import ScannerPanel from './components/ScannerPanel.jsx'
-import Sidebar from './components/Sidebar.jsx'
 import { analyzeImage, createBatch, fetchBatches, fetchHistory } from './lib/api.js'
 import {
   DEFAULT_METRICS,
@@ -79,7 +79,10 @@ export default function App() {
   const [auditLogs, setAuditLogs] = useState([])
   const [engineMode, setEngineMode] = useState('Lokal Canvas')
   const [scanning, setScanning] = useState(false)
-  const [navOpen, setNavOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState('periksa')
+  const [online, setOnline] = useState(() =>
+    typeof navigator === 'undefined' ? true : navigator.onLine,
+  )
   const [activePreset, setActivePreset] = useState('fresh_beef')
   const [batches, setBatches] = useState([])
   const [activeBatch, setActiveBatch] = useState(null)
@@ -111,12 +114,22 @@ export default function App() {
   )
 
   useEffect(() => {
-    const original = document.body.style.overflow
-    document.body.style.overflow = navOpen ? 'hidden' : original
-    return () => {
-      document.body.style.overflow = original
+    const handleOnline = () => {
+      setOnline(true)
+      notify('Kembali online · sinkronisasi server tersedia.')
     }
-  }, [navOpen])
+    const handleOffline = () => {
+      setOnline(false)
+      notify('Anda offline · analisis lokal tetap dapat dipakai.')
+    }
+
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
+    return () => {
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
+  }, [notify])
 
   const refreshHistory = useCallback(async () => {
     try {
@@ -303,6 +316,7 @@ export default function App() {
           ? `Analisis FastAPI selesai · tersimpan di ${batchAtUpload.name}.`
           : 'Analisis FastAPI selesai · ID batch baru tersimpan di riwayat.',
       )
+      if (!keepScanning) setActiveTab('hasil')
       console.log('Hasil audit FastAPI (CIELAB + GLCM):', data)
     } catch (error) {
       if (uploadId !== requestSeq.current) return
@@ -317,6 +331,7 @@ export default function App() {
         batchName: batchAtUpload?.name ?? null,
       })
       notify('Backend tidak aktif · hasil lokal ditampilkan, belum tersimpan ke SQLite.')
+      if (!keepScanning) setActiveTab('hasil')
     } finally {
       if (!keepScanning && uploadId === requestSeq.current) setScanning(false)
     }
@@ -335,6 +350,7 @@ export default function App() {
       await handleFile(file, { keepScanning: true })
     }
     setScanning(false)
+    setActiveTab('riwayat')
     notify(
       `${selected.length} foto selesai diproses${
         activeBatch ? ` di ${activeBatch.name}` : ''
@@ -344,34 +360,85 @@ export default function App() {
 
   const handlePrint = () => printCertificate(result, auditLogs)
   const handleExport = () => exportAuditJson(auditLogs)
+  const activeTabMeta = TABS.find((tab) => tab.id === activeTab) ?? TABS[0]
 
   return (
     <div className="min-h-screen text-slate-800">
-      <Sidebar
-        open={navOpen}
-        onClose={() => setNavOpen(false)}
+      <AppBar
+        title={activeTabMeta.title}
         engineMode={engineMode}
+        online={online}
       />
 
-      <div className="relative min-h-screen lg:pl-64">
-        <Header
-          engineMode={engineMode}
-          onOpenMenu={() => setNavOpen(true)}
-        />
+      <main className="mx-auto w-full max-w-5xl px-4 pb-[calc(5.5rem+env(safe-area-inset-bottom))] pt-[calc(3.5rem+env(safe-area-inset-top))] sm:px-6">
+        {/* Tab Periksa: kamera dan parameter tetap ter-mount agar canvasRef selalu tersedia. */}
+        <section
+          id="tab-periksa"
+          role="tabpanel"
+          aria-label="Periksa sampel"
+          className={activeTab === 'periksa' ? 'space-y-4 pt-4' : 'hidden'}
+        >
+          <div>
+            <h2 className="text-lg font-bold tracking-tight text-slate-900">
+              Pemeriksaan Mutu Daging
+            </h2>
+            <p className="mt-0.5 text-xs text-slate-500">
+              Ambil foto sampel, lalu sistem menghitung CIELAB, GLCM, dan estimasi TVB-N.
+            </p>
+          </div>
 
-        <main className="mx-auto w-full max-w-7xl px-4 pb-12 pt-20 sm:px-6">
-          {/* Hero Header Section */}
-          <section id="pemeriksaan" className="mb-6 scroll-mt-20">
-            <div>
-              <h1 className="text-xl font-bold tracking-tight text-slate-900 sm:text-2xl">
-                Pemeriksaan Mutu Daging &amp; Keamanan Pangan
-              </h1>
-              <p className="mt-1 text-xs text-slate-500 sm:text-sm">
-                Analisis citra visual CIELAB &amp; tekstur GLCM serta estimasi biomarker TVB-N untuk pengujian kesegaran daging.
-              </p>
-            </div>
-          </section>
+          <ScannerPanel
+            canvasRef={canvasRef}
+            metrics={metrics}
+            result={result}
+            scanning={scanning}
+            onUpload={handleUpload}
+          />
 
+          <PresetBar onSelect={selectPreset} activePreset={activePreset} />
+
+          <div id="parameter">
+            <ParameterPanel
+              batch={activeBatch}
+              form={form}
+              scanning={scanning}
+              onChange={updateForm}
+              onScan={handleScan}
+            />
+          </div>
+        </section>
+
+        <section
+          id="tab-hasil"
+          role="tabpanel"
+          aria-label="Hasil analisis"
+          className={activeTab === 'hasil' ? 'space-y-4 pt-4' : 'hidden'}
+        >
+          <DiagnosisPanel result={result} />
+          <button
+            type="button"
+            onClick={() => setActiveTab('periksa')}
+            className="w-full rounded-lg border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 hover:bg-slate-50"
+          >
+            Periksa Sampel Lain
+          </button>
+        </section>
+
+        <section
+          id="tab-riwayat"
+          role="tabpanel"
+          aria-label="Riwayat inspeksi"
+          className={activeTab === 'riwayat' ? 'space-y-4 pt-4' : 'hidden'}
+        >
+          <AuditTable logs={auditLogs} onExport={handleExport} onPrint={handlePrint} />
+        </section>
+
+        <section
+          id="tab-batch"
+          role="tabpanel"
+          aria-label="Batch daging"
+          className={activeTab === 'batch' ? 'space-y-4 pt-4' : 'hidden'}
+        >
           <BatchPanel
             batches={batches}
             activeBatch={activeBatch}
@@ -379,77 +446,56 @@ export default function App() {
             onSelect={handleSelectBatch}
             onCreate={handleCreateBatch}
           />
+        </section>
 
-          <PresetBar onSelect={selectPreset} activePreset={activePreset} />
-
-          <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(0,0.85fr)]">
-            <div className="min-w-0 space-y-6">
-              <ScannerPanel
-                canvasRef={canvasRef}
-                metrics={metrics}
-                result={result}
-                scanning={scanning}
-                onUpload={handleUpload}
-              />
-              <div id="parameter" className="scroll-mt-24">
-                <ParameterPanel
-                  batch={activeBatch}
-                  form={form}
-                  scanning={scanning}
-                  onChange={updateForm}
-                  onScan={handleScan}
-                />
-              </div>
+        <section
+          id="tab-info"
+          role="tabpanel"
+          aria-label="Informasi aplikasi"
+          className={activeTab === 'info' ? 'space-y-4 pt-4' : 'hidden'}
+        >
+          <div className="glass-card p-5">
+            <div className="border-b border-slate-100 pb-3">
+              <h2 className="text-sm font-bold text-slate-900">
+                Standar Klasifikasi Mutu Daging
+              </h2>
+              <p className="text-xs text-slate-500">
+                Pedoman acuan mutu berdasarkan indeks kesegaran komposit (0–100)
+              </p>
             </div>
 
-            <div className="min-w-0 space-y-6">
-              <DiagnosisPanel result={result} />
-              <div id="riwayat" className="scroll-mt-24">
-                <AuditTable logs={auditLogs} onExport={handleExport} onPrint={handlePrint} />
-              </div>
+            <div className="mt-4 grid gap-3 sm:grid-cols-3">
+              {STANDARDS.map((item) => (
+                <div
+                  key={item.label}
+                  className="rounded-lg border border-slate-200 bg-slate-50/50 p-3.5"
+                >
+                  <div className="text-xs font-semibold text-slate-900">{item.label}</div>
+                  <div className="mt-0.5 font-mono text-xs font-bold text-slate-700">{item.range}</div>
+                  <p className="mt-1 text-xs leading-relaxed text-slate-600">{item.description}</p>
+                </div>
+              ))}
             </div>
           </div>
 
-          {/* Quality Standards Reference Section */}
-          <section id="standar" className="mt-6 scroll-mt-20">
-            <div className="glass-card p-5">
-              <div className="border-b border-slate-100 pb-3">
-                <h2 className="text-sm font-bold text-slate-900">
-                  Standar Klasifikasi Mutu Daging
-                </h2>
-                <p className="text-xs text-slate-500">
-                  Pedoman acuan mutu berdasarkan indeks kesegaran komposit (0–100)
-                </p>
-              </div>
-
-              <div className="mt-4 grid gap-3 sm:grid-cols-3">
-                {STANDARDS.map((item) => (
-                  <div
-                    key={item.label}
-                    className="rounded-lg border border-slate-200 bg-slate-50/50 p-3.5"
-                  >
-                    <div className="font-semibold text-xs text-slate-900">{item.label}</div>
-                    <div className="mt-0.5 font-mono text-xs font-bold text-slate-700">{item.range}</div>
-                    <p className="mt-1 text-xs text-slate-600 leading-relaxed">{item.description}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </section>
-
-          <footer className="mt-8 border-t border-slate-200 pt-4 text-center">
+          <footer className="border-t border-slate-200 pt-4 text-center">
             <p className="text-xs text-slate-400">
               FreshMeat AI — Sistem Uji Cepat Mutu Daging
             </p>
+            <p className="mt-1 text-[11px] text-slate-400">
+              Hasil bersifat estimasi pendukung keputusan, bukan pengganti uji laboratorium.
+            </p>
           </footer>
-        </main>
-      </div>
+        </section>
+      </main>
+
+      <BottomNav activeTab={activeTab} onChange={setActiveTab} />
 
       {toast && (
         <div
           role="status"
           aria-live="polite"
-          className="fixed bottom-5 right-5 z-50 rounded-lg border border-slate-200 bg-white p-3 text-xs shadow-md max-w-sm"
+          className="fixed inset-x-4 bottom-[calc(5.5rem+env(safe-area-inset-bottom))] z-50 mx-auto max-w-sm rounded-lg border border-slate-200 bg-white p-3 text-xs shadow-lg sm:inset-x-auto sm:right-6"
         >
           <div className="font-semibold text-slate-900">Notifikasi</div>
           <div className="mt-0.5 text-slate-600">{toast}</div>
