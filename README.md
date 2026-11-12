@@ -6,9 +6,10 @@ Sistem inspeksi kesegaran daging berbasis computer vision (CIELAB + GLCM) dan es
 
 - Dashboard React interaktif dengan 4 skenario demo: sapi segar, ayam mulai menurun, indikasi gelonggongan, dan daging busuk.
 - Analisis piksel Canvas lokal sebagai fallback tanpa backend.
-- Ekstraksi fitur CIELAB (L\*, a\*, b\*, chroma, hue, diskolorasi, oksimioglobin).
+- Segmentasi ROI sadar-marbling: lemak putih wagyu dipisahkan dari otot agar tidak dianggap diskolorasi atau pantulan air.
+- Ekstraksi fitur CIELAB (L\*, a\*, b\*, chroma, hue, diskolorasi otot, oksimioglobin, rasio marbling).
 - Fitur tekstur GLCM (contrast, homogeneity, energy, correlation) dan specular wetness.
-- Hard override rules RULE-01 s.d. RULE-03.
+- Hard override rules RULE-01 s.d. RULE-03 dengan guard warna otot untuk mencegah false reject pada daging merah segar.
 - Estimasi TVB-N, klasifikasi Grade A/B/Reject, dan shelf-life.
 - Riwayat audit persisten di SQLite, ekspor JSON, dan cetak sertifikat.
 
@@ -88,7 +89,7 @@ npm run build
 .venv/bin/pytest
 ```
 
-Test mencakup endpoint API, klasifikasi Grade A/B/Reject, batas RULE-01 s.d. RULE-03, validasi file, persistensi riwayat, dan penyajian frontend hasil build. CI ada di `.github/workflows/ci.yml`.
+Test mencakup endpoint API, klasifikasi Grade A/B/Reject, regresi wagyu bermarbling tinggi agar tetap Grade A, batas RULE-01 s.d. RULE-03, validasi file, persistensi riwayat, dan penyajian frontend hasil build. CI ada di `.github/workflows/ci.yml`.
 
 ## Konfigurasi
 
@@ -123,7 +124,7 @@ curl -X POST http://localhost:8000/api/v1/analyze \
 
 ## Dokumentasi
 
-- `docs/SDD.md` — desain sistem, rumus, rules, dan pengujian.
+- `docs/SDD.md` — desain sistem, rumus, rules, pengujian, serta aturan Git dan kontribusi AI.
 - `docs/ARCHITECTURE.md` — monorepo, dependency graph, dan alur runtime.
 - `infra/README.md` — deployment Docker/Nginx.
 

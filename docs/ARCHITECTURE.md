@@ -82,7 +82,7 @@ Aturan:
 ### 4.1 Mode lokal (edge)
 
 1. React menggambar sampel ke `<canvas>`.
-2. `@freshmeat/analysis` menghitung rasio merah, oksidasi, dan specularity dari piksel.
+2. `@freshmeat/analysis` menghitung rasio merah otot, oksidasi, dan specularity dari piksel; lemak/marbling dan highlight dikeluarkan dari rata-rata warna otot.
 3. Skor lokal, hard rules, dan shelf-life dihitung di browser.
 4. Hasil ditampilkan tanpa memanggil backend.
 
@@ -90,7 +90,7 @@ Aturan:
 
 1. React mengirim `multipart/form-data` melalui `@freshmeat/api-client`.
 2. `apps/api` memvalidasi upload dan memanggil `freshmeat_core.analyze_sample`.
-3. Core melakukan resize, segmentasi ROI, CIELAB, GLCM, scoring, dan rules.
+3. Core melakukan resize, segmentasi ROI sadar-marbling, pemisahan otot/lemak, CIELAB, GLCM, scoring, dan rules.
 4. `apps/api/app/storage.py` menyimpan payload ke SQLite.
 5. Response dipetakan ke UI React; tabel riwayat dimuat dari `GET /api/v1/inspections`.
 6. Jika backend gagal/timeout, React kembali ke mode lokal.

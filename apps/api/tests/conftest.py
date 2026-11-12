@@ -68,6 +68,65 @@ def pale_meat_jpeg() -> bytes:
     )
 
 
+def build_wagyu_jpeg() -> bytes:
+    """Wagyu segar: otot merah pekat dengan marbling putih tebal dan kilap."""
+    img = np.full((360, 480, 3), (245, 245, 245), dtype=np.uint8)
+    cv2.ellipse(img, (240, 180), (185, 120), 0, 0, 360, (40, 40, 150), -1)
+
+    offsets = [
+        -4,
+        6,
+        -8,
+        3,
+        -2,
+        7,
+        -5,
+        2,
+        -7,
+        5,
+        -3,
+        4,
+        -6,
+        1,
+        -2,
+        6,
+        -4,
+        3,
+        -5,
+        2,
+        -1,
+        4,
+        -3,
+        5,
+    ]
+    for index, dy in enumerate(offsets):
+        y = 72 + index * 9 + dy
+        points = np.array(
+            [[70, y], [150, y + dy], [250, y - dy], [330, y + dy], [415, y]],
+            dtype=np.int32,
+        )
+        cv2.polylines(
+            img,
+            [points],
+            False,
+            (225, 235, 245),
+            2 + (index % 3),
+            cv2.LINE_AA,
+        )
+
+    cv2.ellipse(img, (205, 140), (70, 22), -12, 0, 360, (255, 255, 255), -1)
+    cv2.ellipse(img, (300, 215), (48, 15), 15, 0, 360, (255, 255, 255), -1)
+
+    ok, buf = cv2.imencode(".jpg", img, [cv2.IMWRITE_JPEG_QUALITY, 95])
+    assert ok
+    return buf.tobytes()
+
+
+@pytest.fixture(scope="session")
+def fresh_wagyu_jpeg() -> bytes:
+    return build_wagyu_jpeg()
+
+
 def analyze(
     client: TestClient,
     image_bytes: bytes,

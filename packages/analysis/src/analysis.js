@@ -1,10 +1,11 @@
 export const DEFAULT_METRICS = {
   redRatio: 2.45,
-  specularity: 18,
-  oxidation: 11.2,
+  specularity: 8,
+  oxidation: 8,
   visualScore: 92,
   lightness: 45,
   homogeneity: null,
+  marblingRatio: 0,
   backend: false,
 }
 
@@ -47,34 +48,74 @@ export function analyzeCanvasPixels(ctx, canvas) {
   let rSum = 0
   let gSum = 0
   let bSum = 0
-  let brightCount = 0
+  let muscleCount = 0
+  let fatCount = 0
+  let highlightCount = 0
   let pixelCount = 0
+
+  const accumulate = (r, g, b) => {
+    rSum += r
+    gSum += g
+    bSum += b
+    muscleCount += 1
+  }
 
   for (let i = 0; i < imgData.length; i += 16) {
     const r = imgData[i]
     const g = imgData[i + 1]
     const b = imgData[i + 2]
 
-    if (r + g + b > 65) {
-      rSum += r
-      gSum += g
-      bSum += b
-      pixelCount += 1
+    const maxC = Math.max(r, g, b)
+    const minC = Math.min(r, g, b)
+    const saturation = maxC === 0 ? 0 : (maxC - minC) / maxC
 
+    // Abaikan latar gelap dan piksel yang terlalu gelap untuk dinilai.
+    if (maxC < 35) continue
+    pixelCount += 1
+
+    const isHighlight = maxC >= 245 && saturation <= 0.12
+    const isFat = !isHighlight && maxC >= 150 && saturation <= 0.25
+
+    if (isHighlight) {
+      highlightCount += 1
+      continue
+    }
+    if (isFat) {
+      fatCount += 1
+      continue
+    }
+
+    accumulate(r, g, b)
+  }
+
+  if (pixelCount === 0) return { ...DEFAULT_METRICS }
+
+  // Jika seluruh area hampir putih (daging sangat pucat), tetap analisis
+  // piksel non-highlight agar tidak mengembalikan nilai default.
+  if (muscleCount === 0) {
+    for (let i = 0; i < imgData.length; i += 16) {
+      const r = imgData[i]
+      const g = imgData[i + 1]
+      const b = imgData[i + 2]
       const maxC = Math.max(r, g, b)
       const minC = Math.min(r, g, b)
       const saturation = maxC === 0 ? 0 : (maxC - minC) / maxC
-      if (maxC > 205 && saturation < 0.3) brightCount += 1
+      if (maxC >= 35 && !(maxC >= 245 && saturation <= 0.12)) {
+        accumulate(r, g, b)
+      }
     }
   }
 
-  if (pixelCount === 0) pixelCount = 1
-
-  const rAvg = rSum / pixelCount
-  const gAvg = gSum / pixelCount
-  const bAvg = bSum / pixelCount
+  const divisor = Math.max(muscleCount, 1)
+  const rAvg = rSum / divisor
+  const gAvg = gSum / divisor
+  const bAvg = bSum / divisor
   const redRatio = Number((rAvg / Math.max(gAvg, 1)).toFixed(2))
-  const specularity = Math.min(95, Math.round((brightCount / pixelCount) * 200))
+  const specularity = Math.min(
+    95,
+    Math.round((highlightCount / pixelCount) * 100),
+  )
+  const marblingRatio = Math.min(95, Math.round((fatCount / pixelCount) * 100))
   const visualScore = clamp(Math.round((redRatio - 0.95) * 62), 10, 100)
 
   return {
@@ -84,6 +125,7 @@ export function analyzeCanvasPixels(ctx, canvas) {
     visualScore,
     lightness: Math.round((0.299 * rAvg + 0.587 * gAvg + 0.114 * bAvg) / 2.55),
     homogeneity: null,
+    marblingRatio,
     backend: false,
   }
 }
@@ -114,8 +156,8 @@ export function drawMeatSample(ctx, canvas, type) {
     spotsColor = 'rgba(120, 83, 40, 0.35)'
     glossAlpha = 0.22
   } else if (type === 'gelonggongan') {
-    baseColor = '#e15b64'
-    secondaryColor = '#f43f5e'
+    baseColor = '#d97a82'
+    secondaryColor = '#e88f96'
     fatColor = '#ffe4e6'
     spotsColor = 'rgba(56, 189, 248, 0.25)'
     glossAlpha = 0.55
@@ -302,11 +344,17 @@ export function computeLocalResult(form, metrics = DEFAULT_METRICS) {
     })
   }
 
-  if ((surface === 'wet' || specularity > 38) && commodity.includes('Sapi')) {
+  const paleMuscle =
+    (metrics?.lightness ?? DEFAULT_METRICS.lightness) > 52 && visualScore < 65
+  if (
+    commodity.includes('Sapi') &&
+    (surface === 'wet' || specularity > 25) &&
+    paleMuscle
+  ) {
     total = Math.min(total, 48)
     rules.push({
       title: 'RULE-03 TRIGGERED',
-      desc: 'Saturasi pigmen merah pucat disertai indeks spekularitas air permukaan sangat tinggi. Indikasi kuat injeksi air berlebih.',
+      desc: 'Otot tampak pucat (rasio merah rendah) disertai indeks air permukaan tinggi. Indikasi kuat injeksi air berlebih.',
     })
   }
 
